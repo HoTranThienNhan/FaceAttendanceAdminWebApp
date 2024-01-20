@@ -28,9 +28,10 @@ const HeaderComponent = () => {
    }
    const navigateScannerPage = () => {
       navigate('/scanner');
-  }
-
-
+   }
+   const navigateAddNewPage = () => {
+      navigate('/addnew');
+   }
 
    return (
       <div style={{ margin: '30px 100px' }}>
@@ -42,6 +43,9 @@ const HeaderComponent = () => {
                ?
                <Col style={{ color: '#fff', fontWeight: '700', width: '600px' }}>
                   <Row justify='end'>
+                     <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddNewPage()} >
+                        Add New
+                     </Col>
                      <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateScannerPage()} >
                         Scanner
                      </Col>
