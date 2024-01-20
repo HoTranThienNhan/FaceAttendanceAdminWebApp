@@ -26,9 +26,6 @@ const HeaderComponent = () => {
    const navigateSignInPage = () => {
       navigate('/signin');
    }
-   const navigateScannerPage = () => {
-      navigate('/scanner');
-   }
    const navigateAddNewPage = () => {
       navigate('/addnew');
    }
@@ -45,9 +42,6 @@ const HeaderComponent = () => {
                   <Row justify='end'>
                      <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddNewPage()} >
                         Add New
-                     </Col>
-                     <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateScannerPage()} >
-                        Scanner
                      </Col>
                      <Col span={4} offset={4} style={{ fontSize: '16px' }}>
                         <Row justify="space-between" style={{ width: '80px' }}>

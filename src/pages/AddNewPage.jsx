@@ -29,8 +29,6 @@ const AddNewPage = () => {
         email: '',
     });
 
-    const [isScannerInactive, setIsScannerInactive] = useState(true);
-
     // scan
     const [scanURL, setScanURL] = useState(ImageNotFound);
     const scan = async (newuser) => {
@@ -44,22 +42,16 @@ const AddNewPage = () => {
                 MessagePopup.error('Student ID has already been scanned');
                 return;
             }
+            // parse student state object to query string
+            const queryString = new URLSearchParams(studentState).toString()
             // streaming 
-            setScanURL(`${process.env.REACT_APP_API_URL}/video_feed/${newuser}`);
+            // setScanURL(`${process.env.REACT_APP_API_URL}/video_feed/${newuser}`);
+            setScanURL(`${process.env.REACT_APP_API_URL}/video_feed?${queryString}`);
         }
     }
 
     // handle on change input
     const handleOnChangeStudentState = (e) => {
-        // activate scanner button only after fulfilling student info
-        if (e.target.name === 'id' && e.target.value !== '') {
-            // set active scanner button
-            setIsScannerInactive(false);
-        } else if (e.target.name === 'id' && e.target.value === '') {
-            // set inactive scanner button
-            setIsScannerInactive(true);
-        }
-
         setStudentState({
             ...studentState,
             [e.target.name]: e.target.value
@@ -80,7 +72,8 @@ const AddNewPage = () => {
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
             <Row>
-                <Col span={6} style={{ marginTop: '30px' }}>
+                <Col span={6} style={{ marginTop: '40px' }}>
+                    <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>STUDENT INFORMATION</div>
                     <AddNewForm
                         name="basic"
                         labelCol={{ span: 8 }}
@@ -120,7 +113,7 @@ const AddNewPage = () => {
                             className='auth-form-item-add-new'
                         >
                             <FloatingLabelComponent
-                                label="Student Full Name"
+                                label="Full Name"
                                 value={studentState?.fullname}
                                 styleBefore={{ left: '37px', top: '31px' }}
                                 styleAfter={{ left: '37px', top: '23px' }}
@@ -144,7 +137,7 @@ const AddNewPage = () => {
                             className='auth-form-item-add-new'
                         >
                             <FloatingLabelComponent
-                                label="Student Phone"
+                                label="Phone"
                                 value={studentState?.phone}
                                 styleBefore={{ left: '37px', top: '31px' }}
                                 styleAfter={{ left: '37px', top: '23px' }}
@@ -168,7 +161,7 @@ const AddNewPage = () => {
                             className='auth-form-item-add-new'
                         >
                             <FloatingLabelComponent
-                                label="Student Address"
+                                label="Address"
                                 value={studentState?.address}
                                 styleBefore={{ left: '37px', top: '31px' }}
                                 styleAfter={{ left: '37px', top: '23px' }}
@@ -192,7 +185,7 @@ const AddNewPage = () => {
                             className='auth-form-item-add-new'
                         >
                             <FloatingLabelComponent
-                                label="Student Email"
+                                label="Email"
                                 value={studentState?.email}
                                 styleBefore={{ left: '37px', top: '31px' }}
                                 styleAfter={{ left: '37px', top: '23px' }}
@@ -229,7 +222,13 @@ const AddNewPage = () => {
                         type='primary'
                         onClick={() => scan(studentState?.id)}
                         icon={<ScanOutlined />}
-                        disabled={isScannerInactive}
+                        disabled={
+                            studentState?.id?.length === 0
+                            // || studentState?.fullname?.length === 0
+                            // || studentState?.phone?.length === 0
+                            // || studentState?.address?.length === 0
+                            // || studentState?.email?.length === 0
+                        }
                     >
                         SCAN
                     </Button>
