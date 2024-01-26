@@ -14,3 +14,13 @@ export const createScan = async (newuser) => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_scan?newuser=${newuser}`);
     return res.data;
 }
+
+export const addNew = async () => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/add_new`);
+    return res.data;
+}
+
+export const refreshScan = async (newuser) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/refresh_scan?newuser=${newuser}`);
+    return res.data;
+}

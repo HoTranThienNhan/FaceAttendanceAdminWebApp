@@ -1,17 +1,21 @@
-import { ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import { HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Form, Modal, Row } from 'antd';
+import { Button, Card, Col, Form, Image, Popconfirm, Row } from 'antd';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import InputFormComponent from '../components/InputFormComponent';
 import { styled } from "styled-components";
 import ImageNotFound from '../assets/images/404-image-not-found.png';
 import * as ServerService from '../services/ServerService';
+import { useMutationHook } from '../hooks/useMutationHook';
+import { useSelector } from 'react-redux';
+import LoadingComponent from '../components/LoadingComponent';
+import { containsNumber, containsOnlyNumber } from '../utils';
 
 
 const AddNewPage = () => {
-    const navigate = useNavigate();
+    const user = useSelector((state) => state.user);
 
     const [studentState, setStudentState] = useState({
         id: '',
@@ -32,22 +36,58 @@ const AddNewPage = () => {
     // scan
     const [scanURL, setScanURL] = useState(ImageNotFound);
     const scan = async (newuser) => {
-        if (studentState?.id?.length === 0) {
-            MessagePopup.error('Student ID cannot be empty');
+        if (containsNumber(studentState?.fullname)) {
+            MessagePopup.error('Wrong student full name');
         } else {
             // create user folder in server
             try {
                 await ServerService.createScan(newuser);
+                MessagePopup.success('Scan new student successfully');
             } catch (e) {
                 MessagePopup.error('Student ID has already been scanned');
                 return;
             }
             // parse student state object to query string
-            const queryString = new URLSearchParams(studentState).toString()
+            const queryString = new URLSearchParams(studentState).toString();
             // streaming 
-            // setScanURL(`${process.env.REACT_APP_API_URL}/video_feed/${newuser}`);
             setScanURL(`${process.env.REACT_APP_API_URL}/video_feed?${queryString}`);
         }
+    }
+
+    // add
+    const mutation = useMutationHook(
+        () => {
+            const res = ServerService.addNew();
+            return res;
+        }
+    );
+    const { data, isLoading, isSuccess, isError } = mutation;
+    const handleAddStudent = async () => {
+        mutation.mutate({});
+    }
+    useEffect(() => {
+        if (isSuccess) {
+            MessagePopup.success("Add new student successfully");
+        } else if (isError) {
+            MessagePopup.error('Cannot add new student');
+        }
+    }, [isSuccess, isError])
+
+    // refresh
+    const refreshScan = async (newuser) => {
+        setScanURL(ImageNotFound);
+        try {
+            await ServerService.refreshScan(newuser);
+            MessagePopup.success('Refresh student successfully');
+        } catch (e) {
+            MessagePopup.error('Student ID has not been scanned yet');
+            return;
+        }
+        resetImage();
+    }
+    const [reloadImage, setReloadImage] = useState(1);
+    const resetImage = () => {
+        setReloadImage(Math.random());
     }
 
     // handle on change input
@@ -57,16 +97,17 @@ const AddNewPage = () => {
             [e.target.name]: e.target.value
         });
     }
+    // useEffect(() => {
+    //     // navigate back to home page if already signed in 
+    //     if (user?.fullname) {
+    //         handleNavigateHomePage();
+    //     }
+    // }, [user]);
 
     // navigate
-    const navigateHomePage = () => {
+    const navigate = useNavigate();
+    const handleNavigateHomePage = () => {
         navigate('/');
-    }
-    const navigateSignInPage = () => {
-        navigate('/signin');
-    }
-    const navigateScannerPage = () => {
-        navigate('/scanner');
     }
 
     return (
@@ -97,7 +138,7 @@ const AddNewPage = () => {
                                 <InputFormComponent
                                     name="id"
                                     placeholder=""
-                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                    prefix={<IdcardOutlined className="site-form-item-icon" />}
                                     className='auth-input-add-new'
                                     value={studentState?.id}
                                     onChange={handleOnChangeStudentState}
@@ -145,7 +186,7 @@ const AddNewPage = () => {
                                 <InputFormComponent
                                     name="phone"
                                     placeholder=""
-                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                    prefix={<PhoneOutlined className="site-form-item-icon" />}
                                     className='auth-input-add-new'
                                     value={studentState?.phone}
                                     onChange={handleOnChangeStudentState}
@@ -169,7 +210,7 @@ const AddNewPage = () => {
                                 <InputFormComponent
                                     name="address"
                                     placeholder=""
-                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                    prefix={<HomeOutlined className="site-form-item-icon" />}
                                     className='auth-input-add-new'
                                     value={studentState?.address}
                                     onChange={handleOnChangeStudentState}
@@ -193,26 +234,13 @@ const AddNewPage = () => {
                                 <InputFormComponent
                                     name="email"
                                     placeholder=""
-                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                    prefix={<MailOutlined className="site-form-item-icon" />}
                                     className='auth-input-add-new'
                                     value={studentState?.email}
                                     onChange={handleOnChangeStudentState}
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
-
-                        {/* <Form.Item
-                            wrapperCol={{ span: 24 }}
-                        >
-                            <Button
-                                style={{ borderRadius: '15px', backgroundColor: '#a0a0e1' }}
-                                type='primary'
-                                htmlType='submit'
-                                icon={<UserAddOutlined />}
-                            >
-                                SCAN
-                            </Button>
-                        </Form.Item> */}
                     </AddNewForm>
                 </Col>
 
@@ -224,7 +252,7 @@ const AddNewPage = () => {
                         icon={<ScanOutlined />}
                         disabled={
                             studentState?.id?.length === 0
-                            // || studentState?.fullname?.length === 0
+                            || studentState?.fullname?.length === 0
                             // || studentState?.phone?.length === 0
                             // || studentState?.address?.length === 0
                             // || studentState?.email?.length === 0
@@ -232,7 +260,52 @@ const AddNewPage = () => {
                     >
                         SCAN
                     </Button>
-                    <img src={scanURL} style={{ width: "856px", height: "485px", borderRadius: "20px", marginTop: '20px' }} />
+                    <Button
+                        style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
+                        type='primary'
+                        onClick={() => handleAddStudent()}
+                        icon={<UserAddOutlined />}
+                        disabled={
+                            studentState?.id?.length === 0
+                            || studentState?.fullname?.length === 0
+                            // || studentState?.phone?.length === 0
+                            // || studentState?.address?.length === 0
+                            // || studentState?.email?.length === 0
+                        }
+                    >
+                        ADD
+                    </Button>
+                    <Popconfirm
+                        title="Refresh scan"
+                        description="Are you sure to refresh this student scan?"
+                        onConfirm={() => refreshScan(studentState?.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
+                            type='primary'
+                            icon={<ReloadOutlined />}
+                            disabled={
+                                studentState?.id?.length === 0
+                                || studentState?.fullname?.length === 0
+                                // || studentState?.phone?.length === 0
+                                // || studentState?.address?.length === 0
+                                // || studentState?.email?.length === 0
+                            }
+                        >
+                            REFRESH SCAN
+                        </Button>
+                    </Popconfirm>
+                    <LoadingComponent isLoading={isLoading}>
+                        <Image
+                            src={scanURL}
+                            style={{ width: "856px", height: "485px", borderRadius: "20px", marginTop: '20px' }}
+                            draggable="false"
+                            preview={false}
+                            key={reloadImage}
+                        />
+                    </LoadingComponent>
                 </Col>
             </Row>
         </Card>
