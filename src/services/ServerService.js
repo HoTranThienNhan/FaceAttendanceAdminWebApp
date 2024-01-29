@@ -24,3 +24,24 @@ export const refreshScan = async (newuser) => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/refresh_scan?newuser=${newuser}`);
     return res.data;
 }
+
+export const getAllStudents = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_students`);
+    return res.data;
+}
+
+
+export const createCourse = async (id, name, description) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_course?id=${id}&name=${name}&description=${description}`);
+    return res.data;
+}
+
+export const updateCourse = async (id, name, description) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_course?id=${id}&name=${name}&description=${description}`);
+    return res.data;
+}
+
+export const getAllCourses = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_courses`);
+    return res.data;
+}

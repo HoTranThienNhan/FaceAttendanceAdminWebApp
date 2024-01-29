@@ -29,6 +29,12 @@ const HeaderComponent = () => {
    const navigateAddNewPage = () => {
       navigate('/addnew');
    }
+   const navigateCreateCoursePage = () => {
+      navigate('/createcourse');
+   }
+   const navigateStudentManagementPage = () => {
+      navigate('/studentmanagement');
+   }
 
    return (
       <div style={{ margin: '30px 100px' }}>
@@ -42,6 +48,12 @@ const HeaderComponent = () => {
                   <Row justify='end'>
                      <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddNewPage()} >
                         Add New
+                     </Col>
+                     <Col span={6} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateStudentManagementPage()} >
+                        Student Management
+                     </Col>
+                     <Col span={5} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateCreateCoursePage()} >
+                        Create Course
                      </Col>
                      <Col span={4} offset={4} style={{ fontSize: '16px' }}>
                         <Row justify="space-between" style={{ width: '80px' }}>

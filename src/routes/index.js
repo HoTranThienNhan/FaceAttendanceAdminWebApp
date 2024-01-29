@@ -2,6 +2,8 @@ import HomePage from "../pages/HomePage";
 import ScannerPage from "../pages/ScannerPage";
 import SignInPage from "../pages/SignInPage";
 import AddNewPage from "../pages/AddNewPage";
+import CreateCoursePage from "../pages/CreateCoursePage";
+import StudentManagementPage from "../pages/StudentManagementPage";
 
 export const routes = [
     {
@@ -31,6 +33,22 @@ export const routes = [
     {
         path: '/addnew',
         page: AddNewPage,
+        isShowHeader: true,
+        isShowFooter: true,
+        isPrivate: false,
+        exact: false,
+    },
+    {
+        path: '/studentmanagement',
+        page: StudentManagementPage,
+        isShowHeader: true,
+        isShowFooter: true,
+        isPrivate: false,
+        exact: false,
+    },
+    {
+        path: '/createcourse',
+        page: CreateCoursePage,
         isShowHeader: true,
         isShowFooter: true,
         isPrivate: false,

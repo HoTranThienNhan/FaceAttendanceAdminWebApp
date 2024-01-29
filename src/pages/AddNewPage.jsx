@@ -253,9 +253,9 @@ const AddNewPage = () => {
                         disabled={
                             studentState?.id?.length === 0
                             || studentState?.fullname?.length === 0
-                            // || studentState?.phone?.length === 0
-                            // || studentState?.address?.length === 0
-                            // || studentState?.email?.length === 0
+                            || studentState?.phone?.length === 0
+                            || studentState?.address?.length === 0
+                            || studentState?.email?.length === 0
                         }
                     >
                         SCAN
@@ -268,9 +268,9 @@ const AddNewPage = () => {
                         disabled={
                             studentState?.id?.length === 0
                             || studentState?.fullname?.length === 0
-                            // || studentState?.phone?.length === 0
-                            // || studentState?.address?.length === 0
-                            // || studentState?.email?.length === 0
+                            || studentState?.phone?.length === 0
+                            || studentState?.address?.length === 0
+                            || studentState?.email?.length === 0
                         }
                     >
                         ADD
@@ -289,9 +289,9 @@ const AddNewPage = () => {
                             disabled={
                                 studentState?.id?.length === 0
                                 || studentState?.fullname?.length === 0
-                                // || studentState?.phone?.length === 0
-                                // || studentState?.address?.length === 0
-                                // || studentState?.email?.length === 0
+                                || studentState?.phone?.length === 0
+                                || studentState?.address?.length === 0
+                                || studentState?.email?.length === 0
                             }
                         >
                             REFRESH SCAN
