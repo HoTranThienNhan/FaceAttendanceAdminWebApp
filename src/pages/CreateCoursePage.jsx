@@ -1,7 +1,7 @@
-import { Button, Card, Col, Form, Row } from 'antd';
+import { Button, Card, Col, Form, Popconfirm, Row, Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
 import InputFormComponent from '../components/InputFormComponent';
-import { FieldNumberOutlined, HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, ReadOutlined, SnippetsOutlined, UserOutlined } from '@ant-design/icons';
+import { FieldNumberOutlined, ReadOutlined, SnippetsOutlined } from '@ant-design/icons';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import styled from 'styled-components';
 import * as ServerService from '../services/ServerService';
@@ -14,7 +14,8 @@ const CreateCoursePage = () => {
     const [courseState, setCourseState] = useState({
         id: '',
         name: '',
-        description: ''
+        description: '',
+        active: 1,
     });
 
     // course button state
@@ -37,7 +38,7 @@ const CreateCoursePage = () => {
     // handle add course
     const addCourse = async (courseState) => {
         try {
-            await ServerService.createCourse(courseState?.id, courseState?.name, courseState?.description);
+            await ServerService.createCourse(courseState?.id, courseState?.name, courseState?.description, courseState?.active);
             MessagePopup.success('Add new course successfully');
             // refetch courses table
             queryAllCourses.refetch();
@@ -45,7 +46,8 @@ const CreateCoursePage = () => {
             setCourseState({
                 id: '',
                 name: '',
-                description: ''
+                description: '',
+                active: 1,
             });
         } catch (e) {
             MessagePopup.error('Course has already existed');
@@ -64,7 +66,8 @@ const CreateCoursePage = () => {
             setCourseState({
                 id: '',
                 name: '',
-                description: ''
+                description: '',
+                active: 1,
             });
         } catch (e) {
             MessagePopup.error('Cannot update course');
@@ -77,7 +80,8 @@ const CreateCoursePage = () => {
         setCourseState({
             id: '',
             name: '',
-            description: ''
+            description: '',
+            active: 1,
         });
     }
 
@@ -101,6 +105,14 @@ const CreateCoursePage = () => {
             className: 'course-description',
             sorter: (a, b) => a.description.localeCompare(b.description),
         },
+        {
+            title: 'Course Active',
+            dataIndex: 'active',
+            className: 'course-active',
+            render: (isActive) => {
+                return renderActiveField(isActive);
+            }
+        },
     ];
     const getAllCourses = async () => {
         const res = await ServerService.getAllCourses();
@@ -111,6 +123,49 @@ const CreateCoursePage = () => {
         queryFn: getAllCourses
     });
     const { isLoading: isLoadingAllCourses, data: allCourses } = queryAllCourses;
+
+    // active field in table
+    const renderActiveField = (isActive) => {
+        return (
+            <Form>
+                <Popconfirm
+                    placement='topRight'
+                    title="Activate/Inactivate The Course"
+                    description={<span>Do you really want to<br />do this process?</span>}
+                    onConfirm={() => handleActiveCourseConfirm()}
+                    onCancel={handleActiveCourseCancel}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <Switch
+                        className='courses-active'
+                        checked={isActive}
+                    />
+                </Popconfirm>
+            </Form>
+        );
+    }
+    const handleActiveCourseConfirm = async () => {
+        try {
+            // switch course status
+            if (courseState?.active === 1) {
+                courseState.active = 0;
+            } else {
+                courseState.active = 1;
+            }
+            await ServerService.updateStatusCourse(courseState?.id, courseState?.active);
+            MessagePopup.success('Update status course successfully');
+            // refetch courses table
+            queryAllCourses.refetch();
+        } catch (e) {
+            MessagePopup.error('Cannot update status course');
+            return;
+        }
+
+    }
+    const handleActiveCourseCancel = () => {
+
+    }
 
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
@@ -251,7 +306,8 @@ const CreateCoursePage = () => {
                                     setCourseState({
                                         id: record?.id,
                                         name: record?.name,
-                                        description: record?.description
+                                        description: record?.description,
+                                        active: record?.active,
                                     });
                                     // change button 'create' course to button 'update'
                                     setCourseButtonState('update');

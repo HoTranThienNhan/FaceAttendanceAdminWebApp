@@ -31,13 +31,18 @@ export const getAllStudents = async () => {
 }
 
 
-export const createCourse = async (id, name, description) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_course?id=${id}&name=${name}&description=${description}`);
+export const createCourse = async (id, name, description, active) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_course?id=${id}&name=${name}&description=${description}&active=${active}`);
     return res.data;
 }
 
 export const updateCourse = async (id, name, description) => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_course?id=${id}&name=${name}&description=${description}`);
+    return res.data;
+}
+
+export const updateStatusCourse = async (id, active) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_status_course?id=${id}&active=${active}`);
     return res.data;
 }
 
