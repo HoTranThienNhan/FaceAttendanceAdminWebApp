@@ -15,8 +15,8 @@ export const createScan = async (newuser) => {
     return res.data;
 }
 
-export const addNew = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/add_new`);
+export const addNew = async (studentId) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/add_new?studentId=${studentId}`);
     return res.data;
 }
 
@@ -25,8 +25,23 @@ export const refreshScan = async (newuser) => {
     return res.data;
 }
 
+export const rescan = async (studentId) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/rescan?studentId=${studentId}`);
+    return res.data;
+}
+
+export const readd = async (studentId) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/readd?studentId=${studentId}`);
+    return res.data;
+}
+
 export const getAllStudents = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_students`);
+    return res.data;
+}
+
+export const updateStudent = async (id, fullname, phone, address, email) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_student?id=${id}&fullname=${fullname}&phone=${phone}&address=${address}&email=${email}`);
     return res.data;
 }
 

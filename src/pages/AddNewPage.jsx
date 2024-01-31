@@ -11,7 +11,7 @@ import * as ServerService from '../services/ServerService';
 import { useMutationHook } from '../hooks/useMutationHook';
 import { useSelector } from 'react-redux';
 import LoadingComponent from '../components/LoadingComponent';
-import { containsNumber, containsOnlyNumber } from '../utils';
+import { containsNumber } from '../utils';
 
 
 const AddNewPage = () => {
@@ -56,14 +56,14 @@ const AddNewPage = () => {
 
     // add
     const mutation = useMutationHook(
-        () => {
-            const res = ServerService.addNew();
+        (studentId) => {
+            const res = ServerService.addNew(studentId);
             return res;
         }
     );
     const { data, isLoading, isSuccess, isError } = mutation;
-    const handleAddStudent = async () => {
-        mutation.mutate({});
+    const handleAddStudent = async (studentId) => {
+        mutation.mutate(studentId);
     }
     useEffect(() => {
         if (isSuccess) {
@@ -263,7 +263,7 @@ const AddNewPage = () => {
                     <Button
                         style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
                         type='primary'
-                        onClick={() => handleAddStudent()}
+                        onClick={() => handleAddStudent(studentState?.id)}
                         icon={<UserAddOutlined />}
                         disabled={
                             studentState?.id?.length === 0
