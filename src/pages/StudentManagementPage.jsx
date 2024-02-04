@@ -68,7 +68,6 @@ const StudentManagementPage = () => {
         },
     ];
     const handleUpdateStudent = (record) => {
-        console.log(record);
         showDrawer();
         setStudentState({
             id: record?.id,

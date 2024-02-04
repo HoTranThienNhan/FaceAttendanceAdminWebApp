@@ -284,13 +284,12 @@ const CreateCoursePage = () => {
                             }
                         </Col>
                         <Col span={11}>
-                            <Button
-                                style={{ borderRadius: '25px', border: '2px solid #a0a0e1', width: '100%', height: '45px', color: '#4d4d7f' }}
+                            <ButtonClear
                                 type='default'
                                 onClick={() => clearForm()}
                             >
                                 CLEAR
-                            </Button>
+                            </ButtonClear>
                         </Col>
                     </Row>
                 </Col>
@@ -351,4 +350,12 @@ const AddNewForm = styled(Form)`
         margin-bottom: 20px; 
         margin-top: 20px;
     }
+`
+
+const ButtonClear = styled(Button)`
+    border-radius: 25px;
+    border: 2px solid #a0a0e1;
+    width: 100%;
+    height: 45px;
+    color: #4d4d7f;
 `

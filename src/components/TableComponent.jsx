@@ -4,7 +4,7 @@ import LoadingComponent from './LoadingComponent';
 
 const TableComponent = (props) => {
     const {
-        selectionType = 'checkbox',
+        selectionType = '',
         data = [],
         columns = [],
         isLoading = false

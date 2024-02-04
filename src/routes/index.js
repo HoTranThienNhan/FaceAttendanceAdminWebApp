@@ -4,6 +4,7 @@ import SignInPage from "../pages/SignInPage";
 import AddNewPage from "../pages/AddNewPage";
 import CreateCoursePage from "../pages/CreateCoursePage";
 import StudentManagementPage from "../pages/StudentManagementPage";
+import ClassAssignmentPage from "../pages/ClassAssignmentPage";
 
 export const routes = [
     {
@@ -49,6 +50,14 @@ export const routes = [
     {
         path: '/createcourse',
         page: CreateCoursePage,
+        isShowHeader: true,
+        isShowFooter: true,
+        isPrivate: false,
+        exact: false,
+    },
+    {
+        path: '/classassignment',
+        page: ClassAssignmentPage,
         isShowHeader: true,
         isShowFooter: true,
         isPrivate: false,

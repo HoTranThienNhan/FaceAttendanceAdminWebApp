@@ -65,3 +65,8 @@ export const getAllCourses = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_courses`);
     return res.data;
 }
+
+export const getAllTeachers = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_teachers`);
+    return res.data;
+}
