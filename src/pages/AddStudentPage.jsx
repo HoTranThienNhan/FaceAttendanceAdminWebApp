@@ -14,7 +14,7 @@ import LoadingComponent from '../components/LoadingComponent';
 import { containsNumber } from '../utils';
 
 
-const AddNewPage = () => {
+const AddStudentPage = () => {
     const user = useSelector((state) => state.user);
 
     const [studentState, setStudentState] = useState({
@@ -312,7 +312,7 @@ const AddNewPage = () => {
     )
 };
 
-export default AddNewPage;
+export default AddStudentPage;
 
 const AddNewForm = styled(Form)`
     .ant-card-body {

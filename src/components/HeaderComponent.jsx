@@ -26,14 +26,17 @@ const HeaderComponent = () => {
    const navigateSignInPage = () => {
       navigate('/signin');
    }
-   const navigateAddNewPage = () => {
-      navigate('/addnew');
+   const navigateAddStudentPage = () => {
+      navigate('/addstudent');
    }
    const navigateCreateCoursePage = () => {
       navigate('/createcourse');
    }
    const navigateStudentManagementPage = () => {
       navigate('/studentmanagement');
+   }
+   const navigateAddTeacherPage = () => {
+      navigate('/addteacher');
    }
    const navigateClassAssignmentPage = () => {
       navigate('/classassignment');
@@ -49,8 +52,8 @@ const HeaderComponent = () => {
                ?
                <Col span={18} style={{ color: '#fff', fontWeight: '700', width: '600px' }}>
                   <Row justify='end'>
-                     <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddNewPage()} >
-                        Add New
+                     <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddStudentPage()} >
+                        Add Student
                      </Col>
                      <Col span={6} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateStudentManagementPage()} >
                         Student Management
@@ -60,6 +63,9 @@ const HeaderComponent = () => {
                      </Col>
                      <Col span={5} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateClassAssignmentPage()} >
                         Class Assignment
+                     </Col>
+                     <Col span={5} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddTeacherPage()} >
+                        Add Teacher
                      </Col>
                      <Col span={4} offset={4} style={{ fontSize: '16px' }}>
                         <Row justify="space-between" style={{ width: '80px' }}>
