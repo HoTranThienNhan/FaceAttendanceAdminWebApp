@@ -70,3 +70,8 @@ export const getAllTeachers = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_teachers`);
     return res.data;
 }
+
+export const createClass = async (data) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_class`, data);
+    return res.data;
+}

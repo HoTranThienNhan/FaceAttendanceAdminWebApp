@@ -8,13 +8,14 @@ import dayjs from 'dayjs';
 import * as ServerService from '../services/ServerService';
 import { useQuery } from '@tanstack/react-query';
 import TableComponent from '../components/TableComponent';
+import * as MessagePopup from '../components/MessagePopupComponent';
 
 const ClassAssignmentPage = () => {
 
     const [classState, setClassState] = useState({
         id: '',
         year: new Date().getFullYear().toString(),
-        semester: 'first-semester',
+        semester: '1',
         teacher: '',
         course: '',
         students: [],
@@ -132,61 +133,97 @@ const ClassAssignmentPage = () => {
             dataIndex: 'day',
             className: 'class-day',
         },
+        // {
+        //     title: 'Time In',
+        //     dataIndex: 'in',
+        //     className: 'class-time-in',
+        //     render: (index) => {
+        //         return timeInPicker(index);
+        //     }
+        // },
+        // {
+        //     title: 'Time Out',
+        //     dataIndex: 'out',
+        //     className: 'class-time-out',
+        //     render: (index) => {
+        //         return timeOutPicker(index);
+        //     }
+        // },
         {
-            title: 'Time In',
-            dataIndex: 'in',
-            className: 'class-time-in',
+            title: 'Time',
+            dataIndex: 'in-out',
+            className: 'class-time-in-out',
             render: (index) => {
-                return timeInPicker(index);
-            }
-        },
-        {
-            title: 'Time Out',
-            dataIndex: 'out',
-            className: 'class-time-out',
-            render: (index) => {
-                return timeOutPicker(index);
+                return timeInOutRangePicker(index);
             }
         },
     ];
     // time in picker
-    const timeInPicker = () => {
-        return (
-            <TimePicker
-                onChange={setTimeIn}
-            />
-        );
-    }
-    const setTimeIn = (time, timeString) => {
-        const timeUpdate = classState?.time?.map(timeItem => {
-            if (timeItem?.day === day) {
-                return {
-                    ...timeItem,
-                    timeIn: timeString,
-                };
-            }
-            return timeItem;
-        });
-        setClassState((prevState) => ({
-            ...prevState,
-            time: timeUpdate,
-        }));
-    }
+    // const timeInPicker = () => {
+    //     return (
+    //         <TimePicker
+    //             onChange={setTimeIn}
+    //         />
+    //     );
+    // }
+    // const setTimeIn = (time, timeString) => {
+    //     const timeUpdate = classState?.time?.map(timeItem => {
+    //         if (timeItem?.day === day) {
+    //             return {
+    //                 ...timeItem,
+    //                 timeIn: timeString,
+    //             };
+    //         }
+    //         return timeItem;
+    //     });
+    //     setClassState((prevState) => ({
+    //         ...prevState,
+    //         time: timeUpdate,
+    //     }));
+    // }
     // time out picker
-    const timeOutPicker = () => {
+    // const timeOutPicker = () => {
+    //     return (
+    //         <TimePicker
+    //             onChange={setTimeOut}
+    //         />
+    //     );
+    // }
+    const [day, setDay] = useState('Monday');
+    // const setTimeOut = (time, timeString) => {
+    //     const timeUpdate = classState?.time?.map(timeItem => {
+    //         if (timeItem?.day === day) {
+    //             return {
+    //                 ...timeItem,
+    //                 timeOut: timeString,
+    //             };
+    //         }
+    //         return timeItem;
+    //     });
+    //     setClassState((prevState) => ({
+    //         ...prevState,
+    //         time: timeUpdate,
+    //     }));
+    // }
+    // range time in/out picker 
+    const { RangePicker } = TimePicker;
+    const timeInOutRangePicker = () => {
         return (
-            <TimePicker
-                onChange={setTimeOut}
+            <RangePicker
+                placeholder={['Time In', 'Time Out']}
+                onChange={setTimeInOut}
             />
         );
     }
-    const [day, setDay] = useState('Monday');
-    const setTimeOut = (time, timeString) => {
+    const setTimeInOut = (time, timeString) => {
+        const timeIn = timeString[0];
+        const timeOut = timeString[1];
         const timeUpdate = classState?.time?.map(timeItem => {
             if (timeItem?.day === day) {
                 return {
                     ...timeItem,
-                    timeOut: timeString,
+                    timeIn: timeIn,
+                    timeOut: timeOut,
                 };
             }
             return timeItem;
@@ -296,7 +333,7 @@ const ClassAssignmentPage = () => {
         });
     });
     const [selectedStudentsItems, setSelectedStudentsItems] = useState([]);
-    const MAX_STUDENTS_COUNT = 2;
+    const MAX_STUDENTS_COUNT = 3;
     const suffixStudentsSelection = (
         <>
             <span>
@@ -314,15 +351,63 @@ const ClassAssignmentPage = () => {
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ADD CLASS BUTTON >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // handle add class
-    const addClass = (classState) => {
-        console.log(classState);
+    const addClass = async (classState) => {
+        try {
+            const res = await ServerService.createClass(classState);
+            MessagePopup.success('Add new class successfully');
+            setClassState({
+                id: '',
+                year: new Date().getFullYear().toString(),
+                semester: '1',
+                teacher: '',
+                course: '',
+                students: [],
+                time: [
+                    {
+                        day: 'Monday',
+                        timeIn: '',
+                        timeOut: '',
+                    },
+                    {
+                        day: 'Tuesday',
+                        timeIn: '',
+                        timeOut: '',
+                    },
+                    {
+                        day: 'Wednesday',
+                        timeIn: '',
+                        timeOut: '',
+                    },
+                    {
+                        day: 'Thursday',
+                        timeIn: '',
+                        timeOut: '',
+                    },
+                    {
+                        day: 'Friday',
+                        timeIn: '',
+                        timeOut: '',
+                    },
+                    {
+                        day: 'Saturday',
+                        timeIn: '',
+                        timeOut: '',
+                    },
+                ],
+            });
+        } catch (e) {
+            MessagePopup.error('Cannot add new class');
+            return;
+        }
     }
 
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
+            <Row justify="center">
+                <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '25px' }}>CLASS ASSIGNMENT</div>
+            </Row>
             <Row>
-                <Col span={16}>
-                    <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>CLASS ASSIGNMENT</div>
+                <Col span={11}>
                     <AddNewForm
                         name="basic"
                         labelCol={{ span: 8 }}
@@ -334,19 +419,18 @@ const ClassAssignmentPage = () => {
                             label=""
                             validateStatus={"validating"}
                             help=""
-                            style={{ marginBottom: '0px' }}
+                            style={{ marginBottom: '0px', padding: '0px 20px' }}
                             className='form-item-input'
                         >
                             <FloatingLabelComponent
                                 label="Class ID"
                                 value={classState?.id}
-                                styleBefore={{ left: '37px', top: '31px' }}
-                                styleAfter={{ left: '37px', top: '23px' }}
+                                styleBefore={{ left: '17px', top: '31px' }}
+                                styleAfter={{ left: '17px', top: '23px' }}
                             >
                                 <InputFormComponent
                                     name="name"
                                     placeholder=""
-                                    prefix={<FieldNumberOutlined className="site-form-item-icon" />}
                                     className='input-class-id'
                                     value={classState?.id}
                                     onChange={handleOnChangeClassId}
@@ -358,21 +442,21 @@ const ClassAssignmentPage = () => {
                             label=""
                             validateStatus={"validating"}
                             help=""
-                            style={{ marginBottom: '0px' }}
+                            style={{ marginBottom: '0px', padding: '0px 20px' }}
                             className='form-item-input'
                         >
                             <FloatingLabelComponent
                                 label="Class Year"
                                 value="hi"
-                                styleBefore={{ left: '37px', top: '31px' }}
-                                styleAfter={{ left: '37px', top: '23px' }}
+                                styleBefore={{ left: '17px', top: '31px' }}
+                                styleAfter={{ left: '17px', top: '23px' }}
                             >
                                 <DatePicker
                                     onChange={onChangeClassYear}
                                     picker="year"
                                     defaultValue={dayjs('2024', 'YYYY')}
                                     className='input-year-picker'
-                                    style={{ width: '100%', padding: '0px 20px' }}
+                                    style={{ width: '100%' }}
                                     allowClear={false}
                                     disabledDate={disabledYear}
                                 />
@@ -394,11 +478,11 @@ const ClassAssignmentPage = () => {
                             >
                                 <Select
                                     className='input-select-semester'
-                                    defaultValue="first-semester"
+                                    defaultValue="1"
                                     onChange={handleOnChangeClassSemester}
                                 >
-                                    <Select.Option value="first-semester">1st Semester</Select.Option>
-                                    <Select.Option value="second-semester">2nd Semester</Select.Option>
+                                    <Select.Option value="1">1st Semester (January - May)</Select.Option>
+                                    <Select.Option value="2">2nd Semester (August - December)</Select.Option>
                                 </Select>
                             </FloatingLabelComponent>
                         </Form.Item>
@@ -476,72 +560,9 @@ const ClassAssignmentPage = () => {
                                     options={studentsOptions}
                                     maxCount={MAX_STUDENTS_COUNT}
                                     suffixIcon={suffixStudentsSelection}
+                                    maxTagCount='responsive'
                                 />
                             </FloatingLabelComponent>
-                        </Form.Item>
-
-                        <Form.Item>
-                            <Col style={{ margin: '20px 0px' }}>
-                                <Row style={{ marginBottom: '20px' }}>
-                                    <DaySelectionButton
-                                        className='unselected-day-button'
-                                        type='default'
-                                        onClick={(e) => handleCheckDay(e, 'Monday')}
-                                    >
-                                        Monday
-                                    </DaySelectionButton>
-                                    <DaySelectionButton
-                                        className='unselected-day-button'
-                                        type='default'
-                                        onClick={(e) => handleCheckDay(e, 'Tuesday')}
-                                    >
-                                        Tuesday
-                                    </DaySelectionButton>
-                                    <DaySelectionButton
-                                        className='unselected-day-button'
-                                        type='default'
-                                        onClick={(e) => handleCheckDay(e, 'Wednesday')}
-                                    >
-                                        Wednesday
-                                    </DaySelectionButton>
-                                </Row>
-                                <Row>
-                                    <DaySelectionButton
-                                        className='unselected-day-button'
-                                        type='default'
-                                        onClick={(e) => handleCheckDay(e, 'Thursday')}
-                                    >
-                                        Thursday
-                                    </DaySelectionButton>
-                                    <DaySelectionButton
-                                        className='unselected-day-button'
-                                        type='default'
-                                        onClick={(e) => handleCheckDay(e, 'Friday')}
-                                    >
-                                        Friday
-                                    </DaySelectionButton>
-                                    <DaySelectionButton
-                                        className='unselected-day-button'
-                                        type='default'
-                                        onClick={(e) => handleCheckDay(e, 'Saturday')}
-                                    >
-                                        Saturday
-                                    </DaySelectionButton>
-                                </Row>
-                            </Col>
-                            <TableComponent
-                                columns={classColumns}
-                                data={dayData?.filter(function (classObject) {
-                                    return classObject.isActive !== false;      // only active class object 
-                                })}
-                                onRow={(record, rowIndex) => {
-                                    return {
-                                        onClick: (event) => {
-                                            setDay(record?.day)
-                                        }
-                                    }
-                                }}
-                            />
                         </Form.Item>
 
                         <Form.Item>
@@ -549,15 +570,79 @@ const ClassAssignmentPage = () => {
                                 style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
                                 type='primary'
                                 onClick={() => addClass(classState)}
-                                // disabled={
-                                //     courseState?.id?.length === 0
-                                //     || courseState?.name?.length === 0
-                                // }
+                            // disabled={
+                            //     courseState?.id?.length === 0
+                            //     || courseState?.name?.length === 0
+                            // }
                             >
                                 CREATE
                             </Button>
                         </Form.Item>
                     </AddNewForm>
+                </Col>
+                <Col span={12} offset={1}>
+                    <Col style={{ margin: '20px 0px' }}>
+                        <Row style={{ marginBottom: '20px' }}>
+                            <DaySelectionButton
+                                className='unselected-day-button'
+                                type='default'
+                                onClick={(e) => handleCheckDay(e, 'Monday')}
+                            >
+                                Monday
+                            </DaySelectionButton>
+                            <DaySelectionButton
+                                className='unselected-day-button'
+                                type='default'
+                                onClick={(e) => handleCheckDay(e, 'Tuesday')}
+                            >
+                                Tuesday
+                            </DaySelectionButton>
+                            <DaySelectionButton
+                                className='unselected-day-button'
+                                type='default'
+                                onClick={(e) => handleCheckDay(e, 'Wednesday')}
+                            >
+                                Wednesday
+                            </DaySelectionButton>
+                        </Row>
+                        <Row>
+                            <DaySelectionButton
+                                className='unselected-day-button'
+                                type='default'
+                                onClick={(e) => handleCheckDay(e, 'Thursday')}
+                            >
+                                Thursday
+                            </DaySelectionButton>
+                            <DaySelectionButton
+                                className='unselected-day-button'
+                                type='default'
+                                onClick={(e) => handleCheckDay(e, 'Friday')}
+                            >
+                                Friday
+                            </DaySelectionButton>
+                            <DaySelectionButton
+                                className='unselected-day-button'
+                                type='default'
+                                onClick={(e) => handleCheckDay(e, 'Saturday')}
+                            >
+                                Saturday
+                            </DaySelectionButton>
+                        </Row>
+                    </Col>
+                    <TableComponent
+                        columns={classColumns}
+                        data={dayData?.filter(function (classObject) {
+                            return classObject.isActive !== false;      // only active class object 
+                        })}
+                        onRow={(record, rowIndex) => {
+                            return {
+                                onClick: (event) => {
+                                    setDay(record?.day)
+                                }
+                            }
+                        }}
+                        pagination={false}
+                    />
                 </Col>
             </Row>
         </Card>
