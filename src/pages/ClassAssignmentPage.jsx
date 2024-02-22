@@ -1,5 +1,5 @@
 import { DownOutlined, FieldNumberOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Card, Col, DatePicker, Form, Row, Select, Table, TimePicker } from 'antd';
+import { Button, Card, Col, DatePicker, Form, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
@@ -303,6 +303,7 @@ const ClassAssignmentPage = () => {
 
         // set button background color by add/remove 'style' class
         const btnClassList = e.target.closest('.ant-btn').classList;
+        console.log(btnClassList);
         if (btnClassList.contains('unselected-day-button')) {
             btnClassList.remove('unselected-day-button');
             btnClassList.add('selected-day-button');
@@ -395,6 +396,46 @@ const ClassAssignmentPage = () => {
                     },
                 ],
             });
+            setSelectedStudentsItems([]);
+            setDayData([
+                {
+                    key: '1',
+                    day: 'Monday',
+                    isActive: false
+                },
+                {
+                    key: '2',
+                    day: 'Tuesday',
+                    isActive: false
+                },
+                {
+                    key: '3',
+                    day: 'Wednesday',
+                    isActive: false
+                },
+                {
+                    key: '4',
+                    day: 'Thursday',
+                    isActive: false
+                },
+                {
+                    key: '5',
+                    day: 'Friday',
+                    isActive: false
+                },
+                {
+                    key: '6',
+                    day: 'Saturday',
+                    isActive: false
+                },
+            ]);
+            // unselect all selected day buttons
+            const selectedDayButtons = document.querySelectorAll('button.selected-day-button');
+            selectedDayButtons.forEach(function (item) {
+                console.log(item.classList);
+                item.classList.remove('selected-day-button');
+                item.classList.add('unselected-day-button');
+            })
         } catch (e) {
             MessagePopup.error('Cannot add new class');
             return;
@@ -472,7 +513,7 @@ const ClassAssignmentPage = () => {
                         >
                             <FloatingLabelComponent
                                 label="Class Semester"
-                                value="hi"
+                                value="semester"
                                 styleBefore={{ left: '37px', top: '31px' }}
                                 styleAfter={{ left: '37px', top: '23px' }}
                             >
@@ -501,9 +542,10 @@ const ClassAssignmentPage = () => {
                                 styleAfter={{ left: '37px', top: '23px' }}
                             >
                                 <Select
-                                    className='input-select-semester'
+                                    className='input-select-teacher'
                                     defaultValue="Select Teacher"
                                     onChange={handleOnChangeTeacher}
+                                    value={classState?.teacher?.length > 0 ? classState?.teacher : "Select Teacher"}
                                 >
                                     {allTeachers?.map((teacher, index) => {
                                         return (
@@ -531,6 +573,7 @@ const ClassAssignmentPage = () => {
                                     className='input-select-semester'
                                     defaultValue="Select Course"
                                     onChange={handleOnChangeCourse}
+                                    value={classState?.course?.length > 0 ? classState?.course : "Select Course"}
                                 >
                                     {allCourses?.map((course, index) => {
                                         return (
@@ -566,17 +609,28 @@ const ClassAssignmentPage = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button
-                                style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
-                                type='primary'
-                                onClick={() => addClass(classState)}
-                            // disabled={
-                            //     courseState?.id?.length === 0
-                            //     || courseState?.name?.length === 0
-                            // }
+                            <Popconfirm
+                                title="Assign class"
+                                description="Are you sure to assign this class?"
+                                onConfirm={() => addClass(classState)}
+                                okText="Yes"
+                                cancelText="No"
                             >
-                                CREATE
-                            </Button>
+                                <Button
+                                    style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
+                                    type='primary'
+                                    disabled={
+                                        classState?.id?.length === 0
+                                        || classState?.year?.length === 0
+                                        || classState?.semester?.length === 0
+                                        || classState?.teacher?.length === 0
+                                        || classState?.course?.length === 0
+                                        || classState?.students?.length === 0
+                                    }
+                                >
+                                    CREATE
+                                </Button>
+                            </Popconfirm>
                         </Form.Item>
                     </AddNewForm>
                 </Col>
@@ -661,7 +715,7 @@ const AddNewForm = styled(Form)`
         border-radius: 0 0 8px 8px;
     }
 
-    .input-class-id, .input-add-new, .input-select-semester, .input-year-picker, .input-select-students {
+    .input-class-id, .input-add-new, .input-select-semester, .input-select-teacher, .input-year-picker, .input-select-students {
         height: 45px;
         border-radius: 25px;
         padding: 0px 18px;
@@ -669,18 +723,21 @@ const AddNewForm = styled(Form)`
     }
 
     .input-select-semester .ant-select-selector,
-    .input-select-students .ant-select-selector {
+    .input-select-students .ant-select-selector,
+    .input-select-teacher .ant-select-selector {
         border-radius: 25px;
     }
 
     .input-select-semester .ant-select-selector .ant-select-selection-item,
-    .input-select-students .ant-select-selector .ant-select-selection-item {
+    .input-select-students .ant-select-selector .ant-select-selection-item,
+    .input-select-teacher .ant-select-selector .ant-select-selection-item {
         text-align: start;
         padding: 7px 0px 0px 7px;
     }
     
     .input-select-semester .ant-select-arrow,
-    .input-select-students .ant-select-arrow {
+    .input-select-students .ant-select-arrow,
+    .input-select-teacher .ant-select-arrow, {
         margin-right: 20px;
     }
 

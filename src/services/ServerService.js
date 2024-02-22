@@ -71,6 +71,16 @@ export const getAllTeachers = async () => {
     return res.data;
 }
 
+export const addTeacher = async (data) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/add_teacher`, data);
+    return res.data;
+}
+
+export const updateTeacher = async (data) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_teacher`, data);
+    return res.data;
+}
+
 export const createClass = async (data) => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_class`, data);
     return res.data;

@@ -1,15 +1,501 @@
-import { Card, Row } from 'antd';
-import React from 'react';
+import { Button, Card, Col, Form, Popconfirm, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import FloatingLabelComponent from '../components/FloatingLabelComponent';
+import InputFormComponent from '../components/InputFormComponent';
+import { ContactsOutlined, HomeOutlined, IdcardOutlined, LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
+import InputPasswordComponent from '../components/InputPasswordComponent';
+import * as ServerService from '../services/ServerService';
+import { useMutationHook } from '../hooks/useMutationHook';
+import * as MessagePopup from '../components/MessagePopupComponent';
+import TableComponent from '../components/TableComponent';
+import { useQuery } from '@tanstack/react-query';
 
 const AddTeacherPage = () => {
+    const [teacherState, setTeacherState] = useState({
+        id: '',
+        fullname: '',
+        phone: '',
+        address: '',
+        email: '',
+        username: '',
+        password: '',
+    });
+
+    // handle on change input
+    const handleOnChangeTeacherState = (e) => {
+        setTeacherState({
+            ...teacherState,
+            [e.target.name]: e.target.value
+        });
+    }
+    const handleOnChangeTeacherPassword = (e) => {
+        setTeacherState({
+            ...teacherState,
+            password: e
+        });
+    }
+
+    // add teacher
+    const handleAddTeacher = (teacherState) => {
+        mutation.mutate(teacherState);
+    }
+    const mutation = useMutationHook(
+        (teacherState) => {
+            const res = ServerService.addTeacher(teacherState);
+            return res;
+        }
+    );
+    const { data, isLoading, isSuccess, isError } = mutation;
+    useEffect(() => {
+        if (isSuccess) {
+            MessagePopup.success("Add new teacher successfully");
+            // refetch teachers table
+            queryAllTeachers.refetch();
+            // refresh teacher information form
+            setTeacherState({
+                id: '',
+                fullname: '',
+                phone: '',
+                address: '',
+                email: '',
+                username: '',
+                password: '',
+            });
+        } else if (isError) {
+            MessagePopup.error('Cannot add new teacher');
+        }
+    }, [isSuccess, isError])
+
+    // teachers table
+    const teacherColumns = [
+        {
+            title: 'Teacher ID',
+            dataIndex: 'id',
+            className: 'teacher-id',
+            sorter: (a, b) => a.id.localeCompare(b.id),
+        },
+        {
+            title: 'Full Name',
+            dataIndex: 'fullname',
+            className: 'teacher-fullname',
+            sorter: (a, b) => a.fullname.localeCompare(b.fullname),
+        },
+        {
+            title: 'Phone',
+            dataIndex: 'phone',
+            className: 'teacher-phone',
+            sorter: (a, b) => a.phone.localeCompare(b.phone),
+        },
+        {
+            title: 'Address',
+            dataIndex: 'address',
+            className: 'teacher-address',
+            sorter: (a, b) => a.address.localeCompare(b.address),
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            className: 'teacher-email',
+            sorter: (a, b) => a.email.localeCompare(b.email),
+        },
+        {
+            title: 'Username',
+            dataIndex: 'username',
+            className: 'teacher-username',
+            sorter: (a, b) => a.username.localeCompare(b.username),
+        },
+    ];
+    const getAllTeachers = async () => {
+        const res = await ServerService.getAllTeachers();
+        return res;
+    }
+    const queryAllTeachers = useQuery({
+        queryKey: ['teachers'],
+        queryFn: getAllTeachers
+    });
+    const { isLoading: isLoadingAllTeachers, data: allTeachers } = queryAllTeachers;
+
+    // update teacher
+    const handleUpdateTeacher = async (teacherState) => {
+        try {
+            await ServerService.updateTeacher(teacherState);
+            MessagePopup.success('Update teacher successfully');
+            // refetch teachers table
+            queryAllTeachers.refetch();
+            // refresh teacher information form
+            setTeacherState({
+                id: '',
+                fullname: '',
+                phone: '',
+                address: '',
+                email: '',
+                username: '',
+                password: '',
+            });
+        } catch (e) {
+            MessagePopup.error('Cannot update teacher');
+            return;
+        }
+    }
+
+    // teacher button state
+    const [teacherButtonState, setTeacherButtonState] = useState('create');
+    useEffect(() => {
+        // change teacher button to create when clear form
+        if (teacherState?.id?.length === 0
+            && teacherState?.fullname?.length === 0
+            && teacherState?.phone?.length === 0
+            && teacherState?.address?.length === 0
+            && teacherState?.email?.length === 0
+            && teacherState?.username?.length === 0
+            && teacherState?.password?.length === 0
+        ) {
+            setTeacherButtonState('create');
+        }
+    }, [teacherState]);
+
+    // clear form
+    const clearForm = () => {
+        setTeacherState({
+            id: '',
+            fullname: '',
+            phone: '',
+            address: '',
+            email: '',
+            username: '',
+            password: '',
+        });
+    }
+
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
-            <Row justify="center">
-                <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '25px' }}>TEACHER INFORMATION</div>
+            <Row justify="space-between">
+                <Col span={24}>
+                    <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>TEACHER INFORMATION</div>
+                </Col>
             </Row>
-            
+            <AddNewForm
+                name="basic"
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 24 }}
+                initialValues={{ remember: true }}
+                autoComplete="off"
+            >
+                <Row justify="start">
+                    <Col span={10}>
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px' }}
+                            className='auth-form-item-add-new'
+                        >
+                            <FloatingLabelComponent
+                                label="Teacher ID"
+                                value={teacherState?.id}
+                                styleBefore={{ left: '37px', top: '31px' }}
+                                styleAfter={{ left: '37px', top: '23px' }}
+                            >
+                                <InputFormComponent
+                                    name="id"
+                                    placeholder=""
+                                    prefix={<IdcardOutlined className="site-form-item-icon" />}
+                                    className='auth-input-add-new'
+                                    value={teacherState?.id}
+                                    onChange={handleOnChangeTeacherState}
+                                    disabled={teacherState?.id?.length > 0 ? true : false}
+                                />
+                            </FloatingLabelComponent>
+                        </Form.Item>
+
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px' }}
+                            className='auth-form-item-add-new'
+                        >
+                            <FloatingLabelComponent
+                                label="Full Name"
+                                value={teacherState?.fullname}
+                                styleBefore={{ left: '37px', top: '31px' }}
+                                styleAfter={{ left: '37px', top: '23px' }}
+                            >
+                                <InputFormComponent
+                                    name="fullname"
+                                    placeholder=""
+                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                    className='auth-input-add-new'
+                                    value={teacherState?.fullname}
+                                    onChange={handleOnChangeTeacherState}
+                                />
+                            </FloatingLabelComponent>
+                        </Form.Item>
+
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px' }}
+                            className='auth-form-item-add-new'
+                        >
+                            <FloatingLabelComponent
+                                label="Phone"
+                                value={teacherState?.phone}
+                                styleBefore={{ left: '37px', top: '31px' }}
+                                styleAfter={{ left: '37px', top: '23px' }}
+                            >
+                                <InputFormComponent
+                                    name="phone"
+                                    placeholder=""
+                                    prefix={<PhoneOutlined className="site-form-item-icon" />}
+                                    className='auth-input-add-new'
+                                    value={teacherState?.phone}
+                                    onChange={handleOnChangeTeacherState}
+                                />
+                            </FloatingLabelComponent>
+                        </Form.Item>
+
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px' }}
+                            className='auth-form-item-add-new'
+                        >
+                            <FloatingLabelComponent
+                                label="Address"
+                                value={teacherState?.address}
+                                styleBefore={{ left: '37px', top: '31px' }}
+                                styleAfter={{ left: '37px', top: '23px' }}
+                            >
+                                <InputFormComponent
+                                    name="address"
+                                    placeholder=""
+                                    prefix={<HomeOutlined className="site-form-item-icon" />}
+                                    className='auth-input-add-new'
+                                    value={teacherState?.address}
+                                    onChange={handleOnChangeTeacherState}
+                                />
+                            </FloatingLabelComponent>
+                        </Form.Item>
+                    </Col>
+                    <Col span={10} offset={2}>
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px' }}
+                            className='auth-form-item-add-new'
+                        >
+                            <FloatingLabelComponent
+                                label="Email"
+                                value={teacherState?.email}
+                                styleBefore={{ left: '37px', top: '31px' }}
+                                styleAfter={{ left: '37px', top: '23px' }}
+                            >
+                                <InputFormComponent
+                                    name="email"
+                                    placeholder=""
+                                    prefix={<MailOutlined className="site-form-item-icon" />}
+                                    className='auth-input-add-new'
+                                    value={teacherState?.email}
+                                    onChange={handleOnChangeTeacherState}
+                                />
+                            </FloatingLabelComponent>
+                        </Form.Item>
+
+
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px' }}
+                            className='auth-form-item-add-new'
+                        >
+                            <FloatingLabelComponent
+                                label="Username"
+                                value={teacherState?.username}
+                                styleBefore={{ left: '37px', top: '31px' }}
+                                styleAfter={{ left: '37px', top: '23px' }}
+                            >
+                                <InputFormComponent
+                                    name="username"
+                                    placeholder=""
+                                    prefix={<ContactsOutlined className="site-form-item-icon" />}
+                                    className='auth-input-add-new'
+                                    value={teacherState?.username}
+                                    onChange={handleOnChangeTeacherState}
+                                />
+                            </FloatingLabelComponent>
+                        </Form.Item>
+
+                        {teacherButtonState === 'create' &&
+                            <Form.Item
+                                label=""
+                                validateStatus={"validating"}
+                                help=""
+                                style={{ marginBottom: '0px' }}
+                                className='auth-form-item-add-new'
+                            >
+                                <FloatingLabelComponent
+                                    label="Password"
+                                    value={teacherState?.password}
+                                    styleBefore={{ left: '37px', top: '31px' }}
+                                    styleAfter={{ left: '37px', top: '23px' }}
+                                >
+                                    <InputPasswordComponent
+                                        placeholder=""
+                                        prefix={<LockOutlined className="site-form-item-icon" />}
+                                        className='auth-input-add-new'
+                                        value={teacherState?.password}
+                                        onChange={handleOnChangeTeacherPassword}
+                                    />
+                                </FloatingLabelComponent>
+                            </Form.Item>
+                        }
+
+                        <Form.Item>
+                            <Row justify="space-between" style={{ marginTop: '20px' }}>
+                                <Col span={11}>
+                                    {teacherButtonState === 'create'
+                                        || (teacherState?.id?.length === 0
+                                            && teacherState?.fullname?.length === 0
+                                            && teacherState?.phone?.length === 0
+                                            && teacherState?.address?.length === 0
+                                            && teacherState?.email?.length === 0
+                                            && teacherState?.username?.length === 0
+                                            && teacherState?.password?.length === 0)
+                                        ?
+                                        <Popconfirm
+                                            title="Create teacher"
+                                            description="Are you sure to create this teacher?"
+                                            onConfirm={() => handleAddTeacher(teacherState)}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button
+                                                style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
+                                                type='primary'
+                                                disabled={
+                                                    teacherState?.id?.length === 0
+                                                    || teacherState?.fullname?.length === 0
+                                                    || teacherState?.phone?.length === 0
+                                                    || teacherState?.address?.length === 0
+                                                    || teacherState?.email?.length === 0
+                                                    || teacherState?.username?.length === 0
+                                                    || teacherState?.password?.length === 0
+                                                }
+                                            >
+                                                CREATE
+                                            </Button>
+                                        </Popconfirm>
+                                        :
+                                        <Popconfirm
+                                            title="Update teacher"
+                                            description="Are you sure to update this teacher?"
+                                            onConfirm={() => handleUpdateTeacher(teacherState)}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button
+                                                style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
+                                                type='primary'
+                                                disabled={
+                                                    teacherState?.id?.length === 0
+                                                    || teacherState?.fullname?.length === 0
+                                                    || teacherState?.phone?.length === 0
+                                                    || teacherState?.address?.length === 0
+                                                    || teacherState?.email?.length === 0
+                                                    || teacherState?.username?.length === 0
+                                                    || teacherState?.password?.length === 0
+                                                }
+                                            >
+                                                UPDATE
+                                            </Button>
+                                        </Popconfirm>
+                                    }
+                                </Col>
+                                <Col span={11}>
+                                    <ButtonClear
+                                        type='default'
+                                        onClick={() => clearForm()}
+                                    >
+                                        CLEAR
+                                    </ButtonClear>
+                                </Col>
+                            </Row>
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </AddNewForm>
+            <Row>
+                <Col span={24} style={{ marginTop: '20px' }}>
+                    <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '30px' }}>ALL TEACHERS</div>
+                    <TableComponent
+                        columns={teacherColumns}
+                        data={allTeachers}
+                        onRow={(record, rowIndex) => {
+                            return {
+                                onClick: (event) => {
+                                    // // set the selected teacher information to the form
+                                    setTeacherState({
+                                        id: record?.id,
+                                        fullname: record?.fullname,
+                                        phone: record?.phone,
+                                        address: record?.address,
+                                        email: record?.email,
+                                        username: record?.username,
+                                    });
+                                    // // change button 'create' teacher to button 'update'
+                                    setTeacherButtonState('update');
+                                }
+                            }
+                        }}
+                    />
+                </Col>
+            </Row>
         </Card>
     )
 };
 
 export default AddTeacherPage;
+
+const AddNewForm = styled(Form)`
+    .ant-card-body {
+        padding: 0px;
+    }
+
+    &:where(.css-dev-only-do-not-override-17a39f8).ant-card .ant-card-body {
+        padding: 0px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .auth-input-add-new {
+        height: 45px;
+        border-radius: 25px;
+        padding: 0px 18px;
+        margin-top: 20px; 
+    }
+    
+    .auth-input-add-new .ant-input {
+        padding-top: 7px;
+    }
+
+    .auth-button-signin {
+        height: 50px; 
+        width: 100%; 
+        border-radius: 25px; 
+        margin-bottom: 20px; 
+        margin-top: 20px;
+    }
+`
+
+const ButtonClear = styled(Button)`
+    border-radius: 25px;
+    border: 2px solid #a0a0e1;
+    width: 100%;
+    height: 45px;
+    color: #4d4d7f;
+`

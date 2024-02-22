@@ -258,29 +258,43 @@ const CreateCoursePage = () => {
                                     && courseState?.name?.length === 0
                                     && courseState?.description?.length === 0)
                                 ?
-                                <Button
-                                    style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
-                                    type='primary'
-                                    onClick={() => addCourse(courseState)}
-                                    disabled={
-                                        courseState?.id?.length === 0
-                                        || courseState?.name?.length === 0
-                                    }
+                                <Popconfirm
+                                    title="Create course"
+                                    description="Are you sure to create this course?"
+                                    onConfirm={() => addCourse(courseState)}
+                                    okText="Yes"
+                                    cancelText="No"
                                 >
-                                    CREATE
-                                </Button>
+                                    <Button
+                                        style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
+                                        type='primary'
+                                        disabled={
+                                            courseState?.id?.length === 0
+                                            || courseState?.name?.length === 0
+                                        }
+                                    >
+                                        CREATE
+                                    </Button>
+                                </Popconfirm>
                                 :
-                                <Button
-                                    style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
-                                    type='primary'
-                                    onClick={() => updateCourse(courseState)}
-                                    disabled={
-                                        courseState?.id?.length === 0
-                                        || courseState?.name?.length === 0
-                                    }
+                                <Popconfirm
+                                    title="Update course"
+                                    description="Are you sure to update this course?"
+                                    onConfirm={() => updateCourse(courseState)}
+                                    okText="Yes"
+                                    cancelText="No"
                                 >
-                                    UPDATE
-                                </Button>
+                                    <Button
+                                        style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
+                                        type='primary'
+                                        disabled={
+                                            courseState?.id?.length === 0
+                                            || courseState?.name?.length === 0
+                                        }
+                                    >
+                                        UPDATE
+                                    </Button>
+                                </Popconfirm>
                             }
                         </Col>
                         <Col span={11}>
