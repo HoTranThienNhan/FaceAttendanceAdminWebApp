@@ -6,7 +6,7 @@ export const getTest = async () => {
 }
 
 export const signIn = async (username, password) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/signin?username=${username}&password=${password}`);
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/signin_admin?username=${username}&password=${password}`);
     return res.data;
 }
 

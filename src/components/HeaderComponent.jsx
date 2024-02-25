@@ -40,7 +40,7 @@ const HeaderComponent = () => {
    ];
    const navCourseItems = [
       {
-         key: '3',
+         key: '1',
          label: (
             <a target="_blank" rel="noopener noreferrer" onClick={() => navigateCreateCoursePage()}>
                Course Management
@@ -50,7 +50,7 @@ const HeaderComponent = () => {
    ];
    const navClassItems = [
       {
-         key: '4',
+         key: '1',
          label: (
             <a target="_blank" rel="noopener noreferrer" onClick={() => navigateClassAssignmentPage()}>
                Class Assignment
@@ -60,7 +60,7 @@ const HeaderComponent = () => {
    ];
    const navTeacherItems = [
       {
-         key: '5',
+         key: '1',
          label: (
             <a target="_blank" rel="noopener noreferrer" onClick={() => navigateAddTeacherPage()}>
                Teacher Management
@@ -70,7 +70,7 @@ const HeaderComponent = () => {
    ];
    const navUsernameItems = [
       {
-         key: '6',
+         key: '1',
          label: (
             <a target="_blank" rel="noopener noreferrer" onClick={() => handleSignOut()}>
                Log Out
@@ -187,38 +187,6 @@ const HeaderComponent = () => {
                   <div style={{ cursor: 'pointer' }} onClick={() => navigateSignInPage()}>Sign In</div>
                </Col>
             }
-            {/* {user?.fullname
-               ?
-               <Col span={18} style={{ color: '#fff', fontWeight: '700', width: '600px' }}>
-                  <Row justify='end'>
-                     <Col span={4} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddStudentPage()} >
-                        Add Student
-                     </Col>
-                     <Col span={6} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateStudentManagementPage()} >
-                        Student Management
-                     </Col>
-                     <Col span={5} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateCreateCoursePage()} >
-                        Create Course
-                     </Col>
-                     <Col span={5} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateClassAssignmentPage()} >
-                        Class Assignment
-                     </Col>
-                     <Col span={5} style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigateAddTeacherPage()} >
-                        Add Teacher
-                     </Col>
-                     <Col span={4} offset={4} style={{ fontSize: '16px' }}>
-                        <Row justify="space-between" style={{ width: '80px' }}>
-                           <Col>{user?.fullname}</Col>
-                           <Col><LogoutOutlined onClick={() => handleSignOut()} style={{ fontSize: '22px' }} /></Col>
-                        </Row>
-                     </Col>
-                  </Row>
-               </Col>
-               :
-               <Col style={{ color: '#fff', fontWeight: '700' }}>
-                  <div style={{ cursor: 'pointer' }} onClick={() => navigateSignInPage()}>Sign In</div>
-               </Col>
-            } */}
          </Row>
       </div>
    )
