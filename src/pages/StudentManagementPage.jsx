@@ -67,8 +67,11 @@ const StudentManagementPage = () => {
             }
         },
     ];
-    const handleUpdateStudent = (record) => {
+    const [studentImage, setStudentImage] = useState('');
+    const handleUpdateStudent = async (record) => {
         showDrawer();
+        const res = await ServerService.getStudentImage(record?.id);
+        setStudentImage(res?.img);
         setStudentState({
             id: record?.id,
             fullname: record?.fullname,
@@ -86,6 +89,7 @@ const StudentManagementPage = () => {
     const onCloseDrawer = () => {
         setOpenDrawer(false);
         setScanURL(ImageNotFound);
+        setStudentImage('');
     };
 
     // update student form
@@ -192,6 +196,12 @@ const StudentManagementPage = () => {
                                 <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>
                                     STUDENT INFORMATION
                                 </div>
+                                <Image
+                                    src={studentImage}
+                                    style={{ width: "100px", height: "100px", borderRadius: "10px", marginTop: '5px' }}
+                                    draggable="false"
+                                    preview={false}
+                                />
                                 <UpdateStudentForm
                                     name="basic"
                                     labelCol={{ span: 8 }}
@@ -409,7 +419,7 @@ export default StudentManagementPage;
 
 const WrapperStudentManagement = styled(Col)`
     position: relative;
-    height: 630px;
+    height: 650px;
     padding: 48;
     overflow: hidden;
 

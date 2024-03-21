@@ -83,16 +83,16 @@ const ClassAssignmentPage = () => {
     }
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< COURSES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // get all courses
-    const getAllCourses = async () => {
-        const res = await ServerService.getAllCourses();
+    // get all active courses
+    const getAllActiveCourses = async () => {
+        const res = await ServerService.getAllActiveCourses();
         return res;
     }
-    const queryAllCourses = useQuery({
-        queryKey: ['courses'],
-        queryFn: getAllCourses
+    const queryAllActiveCourses = useQuery({
+        queryKey: ['active-courses'],
+        queryFn: getAllActiveCourses
     });
-    const { isLoading: isLoadingAllCourses, data: allCourses } = queryAllCourses;
+    const { isLoading: isLoadingAllActiveCourses, data: allActiveCourses } = queryAllActiveCourses;
 
     // handle on change course
     const handleOnChangeCourse = (course) => {
@@ -133,22 +133,6 @@ const ClassAssignmentPage = () => {
             dataIndex: 'day',
             className: 'class-day',
         },
-        // {
-        //     title: 'Time In',
-        //     dataIndex: 'in',
-        //     className: 'class-time-in',
-        //     render: (index) => {
-        //         return timeInPicker(index);
-        //     }
-        // },
-        // {
-        //     title: 'Time Out',
-        //     dataIndex: 'out',
-        //     className: 'class-time-out',
-        //     render: (index) => {
-        //         return timeOutPicker(index);
-        //     }
-        // },
         {
             title: 'Time',
             dataIndex: 'in-out',
@@ -158,53 +142,8 @@ const ClassAssignmentPage = () => {
             }
         },
     ];
-    // time in picker
-    // const timeInPicker = () => {
-    //     return (
-    //         <TimePicker
-    //             onChange={setTimeIn}
-    //         />
-    //     );
-    // }
-    // const setTimeIn = (time, timeString) => {
-    //     const timeUpdate = classState?.time?.map(timeItem => {
-    //         if (timeItem?.day === day) {
-    //             return {
-    //                 ...timeItem,
-    //                 timeIn: timeString,
-    //             };
-    //         }
-    //         return timeItem;
-    //     });
-    //     setClassState((prevState) => ({
-    //         ...prevState,
-    //         time: timeUpdate,
-    //     }));
-    // }
-    // time out picker
-    // const timeOutPicker = () => {
-    //     return (
-    //         <TimePicker
-    //             onChange={setTimeOut}
-    //         />
-    //     );
-    // }
     const [day, setDay] = useState('Monday');
-    // const setTimeOut = (time, timeString) => {
-    //     const timeUpdate = classState?.time?.map(timeItem => {
-    //         if (timeItem?.day === day) {
-    //             return {
-    //                 ...timeItem,
-    //                 timeOut: timeString,
-    //             };
-    //         }
-    //         return timeItem;
-    //     });
-    //     setClassState((prevState) => ({
-    //         ...prevState,
-    //         time: timeUpdate,
-    //     }));
-    // }
+
     // range time in/out picker 
     const { RangePicker } = TimePicker;
     const timeInOutRangePicker = () => {
@@ -575,7 +514,7 @@ const ClassAssignmentPage = () => {
                                     onChange={handleOnChangeCourse}
                                     value={classState?.course?.length > 0 ? classState?.course : "Select Course"}
                                 >
-                                    {allCourses?.map((course, index) => {
+                                    {allActiveCourses?.map((course, index) => {
                                         return (
                                             <Select.Option value={course?.id}>{course?.id} - {course?.name}</Select.Option>
                                         );

@@ -5,6 +5,7 @@ import AddStudentPage from "../pages/AddStudentPage";
 import CreateCoursePage from "../pages/CreateCoursePage";
 import StudentManagementPage from "../pages/StudentManagementPage";
 import ClassAssignmentPage from "../pages/ClassAssignmentPage";
+import ClassManagementPage from "../pages/ClassManagementPage";
 import AddTeacherPage from "../pages/AddTeacherPage";
 
 export const routes = [
@@ -25,7 +26,7 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/signin',
+        path: '/sign-in',
         page: SignInPage,
         isShowHeader: true,
         isShowFooter: true,
@@ -33,7 +34,7 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/addstudent',
+        path: '/add-student',
         page: AddStudentPage,
         isShowHeader: true,
         isShowFooter: true,
@@ -41,7 +42,7 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/studentmanagement',
+        path: '/student-management',
         page: StudentManagementPage,
         isShowHeader: true,
         isShowFooter: true,
@@ -49,7 +50,7 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/createcourse',
+        path: '/create-course',
         page: CreateCoursePage,
         isShowHeader: true,
         isShowFooter: true,
@@ -57,7 +58,7 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/classassignment',
+        path: '/class-assignment',
         page: ClassAssignmentPage,
         isShowHeader: true,
         isShowFooter: true,
@@ -65,7 +66,15 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/addteacher',
+        path: '/class-management',
+        page: ClassManagementPage,
+        isShowHeader: true,
+        isShowFooter: true,
+        isPrivate: false,
+        exact: false,
+    },
+    {
+        path: '/add-teacher',
         page: AddTeacherPage,
         isShowHeader: true,
         isShowFooter: true,

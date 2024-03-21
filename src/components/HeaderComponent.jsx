@@ -57,6 +57,14 @@ const HeaderComponent = () => {
             </a>
          ),
       },
+      {
+         key: '2',
+         label: (
+            <a target="_blank" rel="noopener noreferrer" onClick={() => navigateClassManagementPage()}>
+               Class Management
+            </a>
+         ),
+      },
    ];
    const navTeacherItems = [
       {
@@ -84,22 +92,25 @@ const HeaderComponent = () => {
       navigate('/');
    }
    const navigateSignInPage = () => {
-      navigate('/signin');
+      navigate('/sign-in');
    }
    const navigateAddStudentPage = () => {
-      navigate('/addstudent');
+      navigate('/add-student');
    }
    const navigateCreateCoursePage = () => {
-      navigate('/createcourse');
+      navigate('/create-course');
    }
    const navigateStudentManagementPage = () => {
-      navigate('/studentmanagement');
+      navigate('/student-management');
    }
    const navigateAddTeacherPage = () => {
-      navigate('/addteacher');
+      navigate('/add-teacher');
    }
    const navigateClassAssignmentPage = () => {
-      navigate('/classassignment');
+      navigate('/class-assignment');
+   }
+   const navigateClassManagementPage = () => {
+      navigate('/class-management');
    }
 
    return (

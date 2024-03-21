@@ -66,6 +66,11 @@ export const getAllCourses = async () => {
     return res.data;
 }
 
+export const getAllActiveCourses = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_active_courses`);
+    return res.data;
+}
+
 export const getAllTeachers = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_teachers`);
     return res.data;
@@ -83,5 +88,30 @@ export const updateTeacher = async (data) => {
 
 export const createClass = async (data) => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_class`, data);
+    return res.data;
+}
+
+export const getAllClasses = async (data) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_classes`, data);
+    return res.data;
+}
+
+export const getAllStudentsByClass = async (classid) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_students_by_class?classid=${classid}`);
+    return res.data;
+}
+
+export const getStudentImage = async (studentid) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_student_image?studentid=${studentid}`);
+    return res.data;
+}
+
+export const getAllClassTime = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_class_time`);
+    return res.data;
+}
+
+export const getClassTimeByClassId = async (classid) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_class_time_by_class_id?classid=${classid}`);
     return res.data;
 }
