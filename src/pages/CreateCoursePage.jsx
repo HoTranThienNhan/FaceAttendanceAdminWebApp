@@ -33,26 +33,32 @@ const CreateCoursePage = () => {
             ...courseState,
             [e.target.name]: e.target.value
         });
+        if (e.target.name === 'id') {
+            setErrorMessage('');
+        }
     }
 
     // handle add course
+    const [errorMessage, setErrorMessage] = useState('');
     const addCourse = async (courseState) => {
-        try {
-            await ServerService.createCourse(courseState?.id, courseState?.name, courseState?.description, courseState?.active);
-            MessagePopup.success('Add new course successfully');
-            // refetch courses table
-            queryAllCourses.refetch();
-            // refresh course information form
-            setCourseState({
-                id: '',
-                name: '',
-                description: '',
-                active: 1,
+        await ServerService.createCourse(courseState?.id, courseState?.name, courseState?.description, courseState?.active)
+            .then(res => {
+                MessagePopup.success('Add new course successfully');
+                // refetch courses table
+                queryAllCourses.refetch();
+                // refresh course information form
+                setCourseState({
+                    id: '',
+                    name: '',
+                    description: '',
+                    active: 1,
+                });
+            })
+            .catch(err => {
+                setErrorMessage(err.message);
+                MessagePopup.error('Course has already existed');
+                return;
             });
-        } catch (e) {
-            MessagePopup.error('Course has already existed');
-            return;
-        }
     }
 
     // update course
@@ -83,6 +89,7 @@ const CreateCoursePage = () => {
             description: '',
             active: 1,
         });
+        setErrorMessage('');
     }
 
     // courses table
@@ -250,6 +257,8 @@ const CreateCoursePage = () => {
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
+
+                        {errorMessage?.length > 0 && <ErrorMessage>{errorMessage}</ErrorMessage>}
                     </AddNewForm>
                     <Row justify="space-between" style={{ marginTop: '20px' }}>
                         <Col span={11}>
@@ -324,6 +333,7 @@ const CreateCoursePage = () => {
                                     });
                                     // change button 'create' course to button 'update'
                                     setCourseButtonState('update');
+                                    setErrorMessage('');
                                 }
                             }
                         }}
@@ -372,4 +382,10 @@ const ButtonClear = styled(Button)`
     width: 100%;
     height: 45px;
     color: #4d4d7f;
+`
+
+const ErrorMessage = styled.div`
+    text-align: start;
+    margin: 15px 0px 0px 20px;
+    color: #ff000d;
 `

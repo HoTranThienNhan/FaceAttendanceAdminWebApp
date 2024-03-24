@@ -1,5 +1,5 @@
 import { DownOutlined, FieldNumberOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Card, Col, DatePicker, Form, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
+import { Button, Card, Col, DatePicker, Empty, Form, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
@@ -52,6 +52,7 @@ const ClassAssignmentPage = () => {
             },
         ],
     });
+    const [errorMessage, setErrorMessage] = useState('');
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< CLASS ID >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // class ID
@@ -60,6 +61,7 @@ const ClassAssignmentPage = () => {
             ...classState,
             id: e.target.value
         });
+        setErrorMessage('');
     }
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TEACHERS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -75,11 +77,12 @@ const ClassAssignmentPage = () => {
     const { isLoading: isLoadingAllTeachers, data: allTeachers } = queryAllTeachers;
 
     // handle on change teacher
-    const handleOnChangeTeacher = (teacher) => {
+    const handleOnChangeTeacher = async (teacher) => {
         setClassState({
             ...classState,
             teacher: teacher
         });
+
     }
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< COURSES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -95,7 +98,7 @@ const ClassAssignmentPage = () => {
     const { isLoading: isLoadingAllActiveCourses, data: allActiveCourses } = queryAllActiveCourses;
 
     // handle on change course
-    const handleOnChangeCourse = (course) => {
+    const handleOnChangeCourse = async (course) => {
         setClassState({
             ...classState,
             course: course
@@ -242,7 +245,6 @@ const ClassAssignmentPage = () => {
 
         // set button background color by add/remove 'style' class
         const btnClassList = e.target.closest('.ant-btn').classList;
-        console.log(btnClassList);
         if (btnClassList.contains('unselected-day-button')) {
             btnClassList.remove('unselected-day-button');
             btnClassList.add('selected-day-button');
@@ -253,27 +255,27 @@ const ClassAssignmentPage = () => {
     }
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< STUDENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // get all students
-    const getAllStudents = async () => {
-        const res = await ServerService.getAllStudents();
-        return res;
-    }
-    const queryAllStudents = useQuery({
-        queryKey: ['students'],
-        queryFn: getAllStudents
-    });
-    const { isLoading: isLoadingAllStudents, data: allStudents } = queryAllStudents;
-
     // students selection
-    let studentsOptions = [];
-    allStudents?.map((student, index) => {
-        studentsOptions.push({
-            label: `${student?.id} - ${student?.fullname}`,
-            value: student?.id
+    const [studentsOptions, setStudentsOptions] = useState([]);
+    const getAvailableStudents = async () => {
+        const res = await ServerService.getAvailableStudents(classState?.teacher, classState?.course);
+        let studentsOptionsArray = [];
+        res?.map((student, index) => {
+            studentsOptionsArray.push({
+                label: `${student?.id} - ${student?.fullname}`,
+                value: student?.id
+            });
         });
-    });
+        setStudentsOptions(studentsOptionsArray);
+    }
+    useEffect(() => {
+        if (classState?.teacher?.length > 0 && classState?.course?.length > 0) {
+            getAvailableStudents();
+        }
+    }, [classState?.teacher, classState?.course]);
+
     const [selectedStudentsItems, setSelectedStudentsItems] = useState([]);
-    const MAX_STUDENTS_COUNT = 3;
+    const MAX_STUDENTS_COUNT = 20;
     const suffixStudentsSelection = (
         <>
             <span>
@@ -292,93 +294,94 @@ const ClassAssignmentPage = () => {
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ADD CLASS BUTTON >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // handle add class
     const addClass = async (classState) => {
-        try {
-            const res = await ServerService.createClass(classState);
-            MessagePopup.success('Add new class successfully');
-            setClassState({
-                id: '',
-                year: new Date().getFullYear().toString(),
-                semester: '1',
-                teacher: '',
-                course: '',
-                students: [],
-                time: [
+        const res = await ServerService.createClass(classState)
+            .then(res => {
+                MessagePopup.success('Add new class successfully');
+                setClassState({
+                    id: '',
+                    year: new Date().getFullYear().toString(),
+                    semester: '1',
+                    teacher: '',
+                    course: '',
+                    students: [],
+                    time: [
+                        {
+                            day: 'Monday',
+                            timeIn: '',
+                            timeOut: '',
+                        },
+                        {
+                            day: 'Tuesday',
+                            timeIn: '',
+                            timeOut: '',
+                        },
+                        {
+                            day: 'Wednesday',
+                            timeIn: '',
+                            timeOut: '',
+                        },
+                        {
+                            day: 'Thursday',
+                            timeIn: '',
+                            timeOut: '',
+                        },
+                        {
+                            day: 'Friday',
+                            timeIn: '',
+                            timeOut: '',
+                        },
+                        {
+                            day: 'Saturday',
+                            timeIn: '',
+                            timeOut: '',
+                        },
+                    ],
+                });
+                setSelectedStudentsItems([]);
+                setDayData([
                     {
+                        key: '1',
                         day: 'Monday',
-                        timeIn: '',
-                        timeOut: '',
+                        isActive: false
                     },
                     {
+                        key: '2',
                         day: 'Tuesday',
-                        timeIn: '',
-                        timeOut: '',
+                        isActive: false
                     },
                     {
+                        key: '3',
                         day: 'Wednesday',
-                        timeIn: '',
-                        timeOut: '',
+                        isActive: false
                     },
                     {
+                        key: '4',
                         day: 'Thursday',
-                        timeIn: '',
-                        timeOut: '',
+                        isActive: false
                     },
                     {
+                        key: '5',
                         day: 'Friday',
-                        timeIn: '',
-                        timeOut: '',
+                        isActive: false
                     },
                     {
+                        key: '6',
                         day: 'Saturday',
-                        timeIn: '',
-                        timeOut: '',
+                        isActive: false
                     },
-                ],
-            });
-            setSelectedStudentsItems([]);
-            setDayData([
-                {
-                    key: '1',
-                    day: 'Monday',
-                    isActive: false
-                },
-                {
-                    key: '2',
-                    day: 'Tuesday',
-                    isActive: false
-                },
-                {
-                    key: '3',
-                    day: 'Wednesday',
-                    isActive: false
-                },
-                {
-                    key: '4',
-                    day: 'Thursday',
-                    isActive: false
-                },
-                {
-                    key: '5',
-                    day: 'Friday',
-                    isActive: false
-                },
-                {
-                    key: '6',
-                    day: 'Saturday',
-                    isActive: false
-                },
-            ]);
-            // unselect all selected day buttons
-            const selectedDayButtons = document.querySelectorAll('button.selected-day-button');
-            selectedDayButtons.forEach(function (item) {
-                console.log(item.classList);
-                item.classList.remove('selected-day-button');
-                item.classList.add('unselected-day-button');
+                ]);
+                // unselect all selected day buttons
+                const selectedDayButtons = document.querySelectorAll('button.selected-day-button');
+                selectedDayButtons.forEach(function (item) {
+                    item.classList.remove('selected-day-button');
+                    item.classList.add('unselected-day-button');
+                })
             })
-        } catch (e) {
-            MessagePopup.error('Cannot add new class');
-            return;
-        }
+            .catch(err => {
+                setErrorMessage(err.message);
+                MessagePopup.error('Cannot add new class');
+                return;
+            });
     }
 
     return (
@@ -543,9 +546,23 @@ const ClassAssignmentPage = () => {
                                     maxCount={MAX_STUDENTS_COUNT}
                                     suffixIcon={suffixStudentsSelection}
                                     maxTagCount='responsive'
+                                    notFoundContent={
+                                        <Empty
+                                            imageStyle={{ height: 70, marginTop: '20px' }}
+                                            style={{ marginBottom: '20px' }}
+                                            description={
+                                                <span style={{ color: '#b4b4b4' }}>
+                                                    No available students.
+                                                </span>
+                                            }
+                                        >
+                                        </Empty>
+                                    }
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
+                        
+                        {errorMessage?.length > 0 && <ErrorMessage>{errorMessage}</ErrorMessage>}
 
                         <Form.Item>
                             <Popconfirm
@@ -556,7 +573,7 @@ const ClassAssignmentPage = () => {
                                 cancelText="No"
                             >
                                 <Button
-                                    style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px' }}
+                                    style={{ borderRadius: '25px', backgroundColor: '#a0a0e1', width: '100%', height: '45px', marginTop: '20px' }}
                                     type='primary'
                                     disabled={
                                         classState?.id?.length === 0
@@ -565,6 +582,7 @@ const ClassAssignmentPage = () => {
                                         || classState?.teacher?.length === 0
                                         || classState?.course?.length === 0
                                         || classState?.students?.length === 0
+                                        || classState?.time.filter(e => (e.timeIn !== '' && e.timeIn !== '')).length === 0
                                     }
                                 >
                                     CREATE
@@ -722,6 +740,12 @@ const DaySelectionButton = styled(Button)`
         color: #fff;
         background-color: #a0a0e1;
     }
+`
+
+const ErrorMessage = styled.div`
+    text-align: start;
+    margin: 5px 0px 0px 20px;
+    color: #ff000d;
 `
 
 

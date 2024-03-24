@@ -10,6 +10,7 @@ import { useMutationHook } from '../hooks/useMutationHook';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
+import { containsNumber, isValidEmail, isValidPhoneNumber } from '../utils';
 
 const AddTeacherPage = () => {
     const [teacherState, setTeacherState] = useState({
@@ -28,6 +29,9 @@ const AddTeacherPage = () => {
             ...teacherState,
             [e.target.name]: e.target.value
         });
+        if (e.target.name === 'id') {
+            setErrorMessage('');
+        }
     }
     const handleOnChangeTeacherPassword = (e) => {
         setTeacherState({
@@ -37,35 +41,54 @@ const AddTeacherPage = () => {
     }
 
     // add teacher
+    const [errorMessage, setErrorMessage] = useState('');
     const handleAddTeacher = (teacherState) => {
-        mutation.mutate(teacherState);
+        if (containsNumber(teacherState?.fullname) === true) {
+            MessagePopup.error('Invalid teacher full name');
+            setErrorMessage('Teacher full name cannot contain number.');
+        } else if (isValidPhoneNumber(teacherState?.phone) === false) {
+            MessagePopup.error('Invalid teacher phone');
+            setErrorMessage('Teacher phone can contain only 10-11 digits.');
+        } else if (isValidEmail(teacherState?.email) === false) {
+            MessagePopup.error('Invalid teacher email');
+            setErrorMessage('Teacher email format is invalid.');
+        } else if (teacherState?.username?.length < 5) {
+            MessagePopup.error('Invalid teacher username');
+            setErrorMessage('Teacher username contains at least 5 characters.');
+        } else if (teacherState?.password?.length < 8) {
+            MessagePopup.error('Invalid teacher password');
+            setErrorMessage('Teacher password contains at least 8 characters.');
+        } else {
+            mutation.mutate(teacherState);
+        }
     }
     const mutation = useMutationHook(
         (teacherState) => {
-            const res = ServerService.addTeacher(teacherState);
+            const res = ServerService.addTeacher(teacherState)
+                .then(res => {
+                    MessagePopup.success("Add new teacher successfully");
+                    // refetch teachers table
+                    queryAllTeachers.refetch();
+                    // refresh teacher information form
+                    setTeacherState({
+                        id: '',
+                        fullname: '',
+                        phone: '',
+                        address: '',
+                        email: '',
+                        username: '',
+                        password: '',
+                    });
+                })
+                .catch(err => {
+                    setErrorMessage(err.message);
+                    MessagePopup.error('Cannot add new teacher');
+                    return;
+                });
             return res;
         }
     );
     const { data, isLoading, isSuccess, isError } = mutation;
-    useEffect(() => {
-        if (isSuccess) {
-            MessagePopup.success("Add new teacher successfully");
-            // refetch teachers table
-            queryAllTeachers.refetch();
-            // refresh teacher information form
-            setTeacherState({
-                id: '',
-                fullname: '',
-                phone: '',
-                address: '',
-                email: '',
-                username: '',
-                password: '',
-            });
-        } else if (isError) {
-            MessagePopup.error('Cannot add new teacher');
-        }
-    }, [isSuccess, isError])
 
     // teachers table
     const teacherColumns = [
@@ -107,7 +130,7 @@ const AddTeacherPage = () => {
         },
     ];
     const getAllTeachers = async () => {
-        const res = await ServerService.getAllTeachers();
+        const res = await ServerService.getAllUsers();
         return res;
     }
     const queryAllTeachers = useQuery({
@@ -166,6 +189,7 @@ const AddTeacherPage = () => {
             username: '',
             password: '',
         });
+        setErrorMessage('');
     }
 
     return (
@@ -204,7 +228,7 @@ const AddTeacherPage = () => {
                                     className='auth-input-add-new'
                                     value={teacherState?.id}
                                     onChange={handleOnChangeTeacherState}
-                                    disabled={teacherState?.id?.length > 0 ? true : false}
+                                    disabled={teacherButtonState === 'update' ? true : false}
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
@@ -356,6 +380,8 @@ const AddTeacherPage = () => {
                             </Form.Item>
                         }
 
+                        {errorMessage?.length > 0 && <ErrorMessage>{errorMessage}</ErrorMessage>}
+
                         <Form.Item>
                             <Row justify="space-between" style={{ marginTop: '20px' }}>
                                 <Col span={11}>
@@ -450,6 +476,7 @@ const AddTeacherPage = () => {
                                     });
                                     // // change button 'create' teacher to button 'update'
                                     setTeacherButtonState('update');
+                                    setErrorMessage('');
                                 }
                             }
                         }}
@@ -498,4 +525,10 @@ const ButtonClear = styled(Button)`
     width: 100%;
     height: 45px;
     color: #4d4d7f;
+`
+
+const ErrorMessage = styled.div`
+    text-align: start;
+    margin: 15px 0px 0px 20px;
+    color: #ff000d;
 `

@@ -11,7 +11,10 @@ export const signIn = async (username, password) => {
 }
 
 export const createScan = async (newuser) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_scan?newuser=${newuser}`);
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_scan?newuser=${newuser}`)
+        .catch((error) => {
+            throw new Error(error.response.data.message)
+        });
     return res.data;
 }
 
@@ -35,8 +38,18 @@ export const readd = async (studentId) => {
     return res.data;
 }
 
+export const getAllUsers = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_users`);
+    return res.data;
+}
+
 export const getAllStudents = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_all_students`);
+    return res.data;
+}
+
+export const getAvailableStudents = async (teacherid, courseid) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_available_students?teacherid=${teacherid}&courseid=${courseid}`);
     return res.data;
 }
 
@@ -47,7 +60,10 @@ export const updateStudent = async (id, fullname, phone, address, email) => {
 
 
 export const createCourse = async (id, name, description, active) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_course?id=${id}&name=${name}&description=${description}&active=${active}`);
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_course?id=${id}&name=${name}&description=${description}&active=${active}`)
+        .catch((error) => {
+            throw new Error(error.response.data.message)
+        });
     return res.data;
 }
 
@@ -77,7 +93,10 @@ export const getAllTeachers = async () => {
 }
 
 export const addTeacher = async (data) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/add_teacher`, data);
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/add_teacher`, data)
+        .catch((error) => {
+            throw new Error(error.response.data.message)
+        });
     return res.data;
 }
 
@@ -87,7 +106,10 @@ export const updateTeacher = async (data) => {
 }
 
 export const createClass = async (data) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_class`, data);
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/create_class`, data)
+        .catch((error) => {
+            throw new Error(error.response.data.message)
+        });
     return res.data;
 }
 

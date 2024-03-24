@@ -11,7 +11,7 @@ import * as ServerService from '../services/ServerService';
 import { useMutationHook } from '../hooks/useMutationHook';
 import { useSelector } from 'react-redux';
 import LoadingComponent from '../components/LoadingComponent';
-import { containsNumber } from '../utils';
+import { containsNumber, isValidEmail, isValidPhoneNumber } from '../utils';
 
 
 const AddStudentPage = () => {
@@ -35,22 +35,32 @@ const AddStudentPage = () => {
 
     // scan
     const [scanURL, setScanURL] = useState(ImageNotFound);
+    const [errorMessage, setErrorMessage] = useState('');
     const scan = async (newuser) => {
-        if (containsNumber(studentState?.fullname)) {
-            MessagePopup.error('Wrong student full name');
+        if (containsNumber(studentState?.fullname) === true) {
+            MessagePopup.error('Invalid student full name');
+            setErrorMessage('Student full name cannot contain number.');
+        } else if (isValidPhoneNumber(studentState?.phone) === false) {
+            MessagePopup.error('Invalid student phone');
+            setErrorMessage('Student phone can contain only 10-11 digits.');
+        } else if (isValidEmail(studentState?.email) === false) {
+            MessagePopup.error('Invalid student email');
+            setErrorMessage('Student email format is invalid.');
         } else {
             // create user folder in server
-            try {
-                await ServerService.createScan(newuser);
-                MessagePopup.success('Scan new student successfully');
-            } catch (e) {
-                MessagePopup.error('Student ID has already been scanned');
-                return;
-            }
-            // parse student state object to query string
-            const queryString = new URLSearchParams(studentState).toString();
-            // streaming 
-            setScanURL(`${process.env.REACT_APP_API_URL}/video_feed?${queryString}`);
+            await ServerService.createScan(newuser)
+                .then(res => {
+                    MessagePopup.success('Scan new student successfully');
+                    // parse student state object to query string
+                    const queryString = new URLSearchParams(studentState).toString();
+                    // streaming 
+                    setScanURL(`${process.env.REACT_APP_API_URL}/video_feed?${queryString}`);
+                })
+                .catch(err => {
+                    setErrorMessage(err.message);
+                    MessagePopup.error('Student ID has already been scanned');
+                    return;
+                });
         }
     }
 
@@ -96,6 +106,9 @@ const AddStudentPage = () => {
             ...studentState,
             [e.target.name]: e.target.value
         });
+        if (e.target.name === 'id') {
+            setErrorMessage('');
+        }
     }
     // useEffect(() => {
     //     // navigate back to home page if already signed in 
@@ -242,6 +255,8 @@ const AddStudentPage = () => {
                             </FloatingLabelComponent>
                         </Form.Item>
                     </AddNewForm>
+
+                    {errorMessage?.length > 0 && <ErrorMessage>{errorMessage}</ErrorMessage>}
                 </Col>
 
                 <Col offset={1} span={17}>
@@ -346,6 +361,6 @@ const AddNewForm = styled(Form)`
 
 const ErrorMessage = styled.div`
     text-align: start;
-    margin: 5px 0px 0px 20px;
+    margin: 15px 0px 0px 20px;
     color: #ff000d;
 `

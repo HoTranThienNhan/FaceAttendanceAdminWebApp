@@ -154,20 +154,6 @@ const HeaderComponent = () => {
                      <Col span={4}>
                         <Dropdown
                            menu={{
-                              items: navClassItems,
-                           }}
-                           arrow={{
-                              pointAtCenter: true,
-                           }}
-                        >
-                           <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
-                              Classes
-                           </span>
-                        </Dropdown>
-                     </Col>
-                     <Col span={4}>
-                        <Dropdown
-                           menu={{
                               items: navTeacherItems,
                            }}
                            arrow={{
@@ -176,6 +162,20 @@ const HeaderComponent = () => {
                         >
                            <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
                               Teachers
+                           </span>
+                        </Dropdown>
+                     </Col>
+                     <Col span={4}>
+                        <Dropdown
+                           menu={{
+                              items: navClassItems,
+                           }}
+                           arrow={{
+                              pointAtCenter: true,
+                           }}
+                        >
+                           <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
+                              Classes
                            </span>
                         </Dropdown>
                      </Col>
