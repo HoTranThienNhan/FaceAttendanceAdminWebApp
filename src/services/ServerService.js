@@ -137,3 +137,8 @@ export const getClassTimeByClassId = async (classid) => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_class_time_by_class_id?classid=${classid}`);
     return res.data;
 }
+
+export const getTimeInAndOutByTeacherIdAndDay = async (teacherid, day) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/get_time_in_and_out_by_teacher_id_and_day?teacherid=${teacherid}&day=${day}`);
+    return res.data;
+}

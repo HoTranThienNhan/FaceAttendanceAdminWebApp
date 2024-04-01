@@ -9,6 +9,7 @@ import * as ServerService from '../services/ServerService';
 import { useQuery } from '@tanstack/react-query';
 import TableComponent from '../components/TableComponent';
 import * as MessagePopup from '../components/MessagePopupComponent';
+import { calculateValidTimeOut, getSeperateTimeFromMinutesAgo, getSeperateTimeFromMinutesLater } from '../utils';
 
 const ClassAssignmentPage = () => {
 
@@ -149,13 +150,124 @@ const ClassAssignmentPage = () => {
 
     // range time in/out picker 
     const { RangePicker } = TimePicker;
+    const [selectedTimeIn, setSelectedTimeIn] = useState('');
+    const disabledTime = (date, type) => {
+        const validTimeOut = calculateValidTimeOut(selectedTimeIn, timeInAndOutByTeacherIdAndDay); ///???
+
+        const validHour = getSeperateTimeFromMinutesAgo(validTimeOut, 15)[0];
+        const validMinute = getSeperateTimeFromMinutesAgo(validTimeOut, 15)[1];
+        const validSecond = getSeperateTimeFromMinutesAgo(validTimeOut, 15)[2];
+
+        const resTimeInAndOut = timeInAndOutByTeacherIdAndDay;
+        if (type === 'start') {
+            let disabledInHoursArray = [];
+            resTimeInAndOut?.map((time, index) => {
+
+                const availableHourIn = parseInt(time.timein.split(':')[0]);
+                const availableHourOut = parseInt(time.timeout.split(':')[0]);
+                const availableMinuteIn = parseInt(time.timein.split(':')[1]);
+                const availableMinuteOut = parseInt(time.timeout.split(':')[1]);
+
+                for (let i = availableHourIn; i <= availableHourOut; i++) {
+                    if ((i === availableHourIn && availableMinuteIn !== 0) || (i === availableHourOut && availableMinuteOut < 45)) {
+
+                    } else {
+                        disabledInHoursArray.push(i);
+                    }
+                }
+            });
+            return {
+                disabledHours: () => {
+                    return disabledInHoursArray;
+                },
+                disabledMinutes: (selectedHour) => {
+                    let disabledInMinutesArray = [];
+
+                    for (let j = 0; j < resTimeInAndOut?.length; j++) {
+                        const hourInFromMinutesAgo = getSeperateTimeFromMinutesAgo(resTimeInAndOut[j]?.timein, 15)[0];
+                        const minuteInFromMinutesAgo = getSeperateTimeFromMinutesAgo(resTimeInAndOut[j]?.timein, 15)[1];
+                        const hourOutFromMinutesLater = getSeperateTimeFromMinutesLater(resTimeInAndOut[j]?.timeout, 15)[0];
+                        const minuteOutFromMinutesLater = getSeperateTimeFromMinutesLater(resTimeInAndOut[j]?.timeout, 15)[1];
+                        if (selectedHour === hourInFromMinutesAgo) {
+                            for (let i = minuteInFromMinutesAgo; i < 60; i++) {
+                                disabledInMinutesArray.push(i);
+                            }
+                        }
+                        if (selectedHour === hourOutFromMinutesLater) {
+                            for (let i = 0; i < minuteOutFromMinutesLater; i++) {
+                                disabledInMinutesArray.push(i);
+                            }
+                        }
+                    }
+                    return disabledInMinutesArray;
+                },
+                disabledSeconds: () => []
+            }
+        } else if (type === 'end') { 
+            const selectedHourIn = parseInt(selectedTimeIn.split(':')[0]);
+            const selectedMinuteIn = parseInt(selectedTimeIn.split(':')[1]);
+            
+            const standardValidTimeOut = calculateValidTimeOut(selectedTimeIn, resTimeInAndOut);
+            const availableHourIn = parseInt(standardValidTimeOut.split(':')[0]);
+            const availableMinuteIn = parseInt(standardValidTimeOut.split(':')[1]);
+
+            console.log(selectedHourIn, selectedMinuteIn);
+            console.log(availableHourIn, availableMinuteIn);
+            return {
+                disabledHours: () => {
+                    let disabledHoursArray = [];
+                    for (let i = 0; i < 24; i++) {
+                        if (i < selectedHourIn || i > availableHourIn) {
+                            disabledHoursArray.push(i);
+                        }
+                    }
+                    return disabledHoursArray;
+                },
+                disabledMinutes: (selectedHour) => {
+                    let disabledMinutesArray = [];
+                    for (let i = 0; i < 60; i++) {
+                        if (selectedHour === availableHourIn && i > availableMinuteIn
+                            || selectedHour === selectedHourIn && i < selectedMinuteIn) {
+                            disabledMinutesArray.push(i);
+                        }
+                    }
+                    return disabledMinutesArray;
+                },
+                disabledSeconds: () => {
+                    return [];
+                }
+            }
+        }
+    }
+    // get time in and time out by teacher id and day
+    const getTimeInAndOutByTeacherIdAndDay = async () => {
+        const resTimeInAndOut = await ServerService.getTimeInAndOutByTeacherIdAndDay(classState?.teacher, day);
+        return resTimeInAndOut;
+    }
+    const queryAllTimeInAndOutByTeacherIdAndDay = useQuery({
+        queryKey: ['time-in-and-out'],
+        queryFn: getTimeInAndOutByTeacherIdAndDay
+    });
+    const { isLoading: isLoadingTimeInAndOutByTeacherIdAndDay, data: timeInAndOutByTeacherIdAndDay } = queryAllTimeInAndOutByTeacherIdAndDay;
+    useEffect(() => {
+        queryAllTimeInAndOutByTeacherIdAndDay.refetch();
+    }, [classState?.teacher, day]);
+    // render time in and out range picker
     const timeInOutRangePicker = () => {
         return (
             <RangePicker
                 placeholder={['Time In', 'Time Out']}
                 onChange={setTimeInOut}
+                disabledTime={disabledTime}
+                onOk={setTimeInOutString}
             />
         );
+    }
+    const setTimeInOutString = (time) => {
+        const inHour = time[0].$H.toString().padStart(2, "0");
+        const inMinute = time[0].$m.toString().padStart(2, "0");
+        const inSecond = time[0].$s.toString().padStart(2, "0");
+        setSelectedTimeIn(inHour + ':' + inMinute + ':' + inSecond);
     }
     const setTimeInOut = (time, timeString) => {
         const timeIn = timeString[0];
@@ -561,7 +673,7 @@ const ClassAssignmentPage = () => {
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
-                        
+
                         {errorMessage?.length > 0 && <ErrorMessage>{errorMessage}</ErrorMessage>}
 
                         <Form.Item>

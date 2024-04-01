@@ -1,7 +1,7 @@
-import { HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import { HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, QuestionCircleOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Form, Image, Popconfirm, Row } from 'antd';
+import { Button, Card, Col, Form, Image, Popconfirm, Row, Tour } from 'antd';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import InputFormComponent from '../components/InputFormComponent';
@@ -117,6 +117,38 @@ const AddStudentPage = () => {
     //     }
     // }, [user]);
 
+    // Help Tour
+    const ref1 = useRef(null);
+    const ref2 = useRef(null);
+    const ref3 = useRef(null);
+    const ref4 = useRef(null);
+    const [openHelpTour, setOpenHelpTour] = useState(false);
+    const helpTourSteps = [
+        {
+            title: 'STUDENT INFORMATION',
+            description: 'Filling in all the student information.',
+            target: () => ref1.current,
+        },
+        {
+            title: 'SCAN',
+            description: 'After filling in the student information form, you can start scanning face with the camera.',
+            target: () => ref2.current,
+        },
+        {
+            title: 'ADD',
+            description: 'By the time you finish your scanned face, you can store these face data to the system.',
+            target: () => ref3.current,
+        },
+        {
+            title: 'REFRESH SCAN',
+            description: 'If there are any problems while scanning face, this helps you to re-scan face.',
+            target: () => ref4.current,
+            nextButtonProps: {
+                children: "Got it"
+            }
+        },
+    ];
+
     // navigate
     const navigate = useNavigate();
     const handleNavigateHomePage = () => {
@@ -126,7 +158,7 @@ const AddStudentPage = () => {
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
             <Row>
-                <Col span={6} style={{ marginTop: '40px' }}>
+                <Col span={6} style={{ marginTop: '40px' }} ref={ref1}>
                     <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>STUDENT INFORMATION</div>
                     <AddNewForm
                         name="basic"
@@ -260,58 +292,80 @@ const AddStudentPage = () => {
                 </Col>
 
                 <Col offset={1} span={17}>
-                    <Button
-                        style={{ borderRadius: '15px', backgroundColor: '#a0a0e1' }}
-                        type='primary'
-                        onClick={() => scan(studentState?.id)}
-                        icon={<ScanOutlined />}
-                        disabled={
-                            studentState?.id?.length === 0
-                            || studentState?.fullname?.length === 0
-                            || studentState?.phone?.length === 0
-                            || studentState?.address?.length === 0
-                            || studentState?.email?.length === 0
-                        }
-                    >
-                        SCAN
-                    </Button>
-                    <Button
-                        style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
-                        type='primary'
-                        onClick={() => handleAddStudent(studentState?.id)}
-                        icon={<UserAddOutlined />}
-                        disabled={
-                            studentState?.id?.length === 0
-                            || studentState?.fullname?.length === 0
-                            || studentState?.phone?.length === 0
-                            || studentState?.address?.length === 0
-                            || studentState?.email?.length === 0
-                        }
-                    >
-                        ADD
-                    </Button>
-                    <Popconfirm
-                        title="Refresh scan"
-                        description="Are you sure to refresh this student scan?"
-                        onConfirm={() => refreshScan(studentState?.id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button
-                            style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
-                            type='primary'
-                            icon={<ReloadOutlined />}
-                            disabled={
-                                studentState?.id?.length === 0
-                                || studentState?.fullname?.length === 0
-                                || studentState?.phone?.length === 0
-                                || studentState?.address?.length === 0
-                                || studentState?.email?.length === 0
-                            }
-                        >
-                            REFRESH SCAN
-                        </Button>
-                    </Popconfirm>
+                    <Row>
+                        <Col offset={7}>
+                            <Button
+                                style={{ borderRadius: '15px', backgroundColor: '#a0a0e1' }}
+                                type='primary'
+                                onClick={() => scan(studentState?.id)}
+                                icon={<ScanOutlined />}
+                                ref={ref2}
+                                disabled={
+                                    studentState?.id?.length === 0
+                                    || studentState?.fullname?.length === 0
+                                    || studentState?.phone?.length === 0
+                                    || studentState?.address?.length === 0
+                                    || studentState?.email?.length === 0
+                                }
+                            >
+                                SCAN
+                            </Button>
+                            <Button
+                                style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
+                                type='primary'
+                                onClick={() => handleAddStudent(studentState?.id)}
+                                icon={<UserAddOutlined />}
+                                ref={ref3}
+                                disabled={
+                                    studentState?.id?.length === 0
+                                    || studentState?.fullname?.length === 0
+                                    || studentState?.phone?.length === 0
+                                    || studentState?.address?.length === 0
+                                    || studentState?.email?.length === 0
+                                }
+                            >
+                                ADD
+                            </Button>
+                            <Popconfirm
+                                title="Refresh scan"
+                                description="Are you sure to refresh this student scan?"
+                                onConfirm={() => refreshScan(studentState?.id)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button
+                                    style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
+                                    type='primary'
+                                    icon={<ReloadOutlined />}
+                                    ref={ref4}
+                                    disabled={
+                                        studentState?.id?.length === 0
+                                        || studentState?.fullname?.length === 0
+                                        || studentState?.phone?.length === 0
+                                        || studentState?.address?.length === 0
+                                        || studentState?.email?.length === 0
+                                    }
+                                >
+                                    REFRESH SCAN
+                                </Button>
+                            </Popconfirm>
+                        </Col>
+                        <Col offset={4}>
+                            <Button
+                                style={{ borderRadius: '15px', color: '#4d4d7f', border: '1px solid #9c93ed' }}
+                                onClick={() => setOpenHelpTour(true)}
+                            >
+                                HELP <QuestionCircleOutlined />
+                            </Button>
+                            <Tour
+                                open={openHelpTour}
+                                onClose={() => setOpenHelpTour(false)} steps={helpTourSteps}
+                            />
+                        </Col>
+                    </Row>
+
+
+
                     <LoadingComponent isLoading={isLoading}>
                         <Image
                             src={scanURL}
