@@ -206,6 +206,7 @@ const CreateCoursePage = () => {
                                     className='auth-input-add-new'
                                     value={courseState?.id}
                                     onChange={handleOnChangeCourseState}
+                                    disabled={courseButtonState === 'update'}
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>

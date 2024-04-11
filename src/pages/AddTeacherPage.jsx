@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Popconfirm, Row } from 'antd';
+import { Button, Card, Col, Form, Popconfirm, Radio, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
@@ -19,8 +19,10 @@ const AddTeacherPage = () => {
         phone: '',
         address: '',
         email: '',
+        gender: 'male',
         username: '',
         password: '',
+        role: '',
     });
 
     // handle on change input
@@ -76,8 +78,10 @@ const AddTeacherPage = () => {
                         phone: '',
                         address: '',
                         email: '',
+                        gender: 'male',
                         username: '',
                         password: '',
+                        role: '',
                     });
                 })
                 .catch(err => {
@@ -123,10 +127,22 @@ const AddTeacherPage = () => {
             sorter: (a, b) => a.email.localeCompare(b.email),
         },
         {
+            title: 'Gender',
+            dataIndex: 'gender',
+            className: 'teacher-gender',
+            sorter: (a, b) => a.gender.localeCompare(b.gender),
+        },
+        {
             title: 'Username',
             dataIndex: 'username',
             className: 'teacher-username',
             sorter: (a, b) => a.username.localeCompare(b.username),
+        },
+        {
+            title: 'Role',
+            dataIndex: 'rolename',
+            className: 'teacher-rolename',
+            sorter: (a, b) => a.rolename.localeCompare(b.rolename),
         },
     ];
     const getAllTeachers = async () => {
@@ -153,8 +169,10 @@ const AddTeacherPage = () => {
                 phone: '',
                 address: '',
                 email: '',
+                gender: 'male',
                 username: '',
                 password: '',
+                role: '',
             });
         } catch (e) {
             MessagePopup.error('Cannot update teacher');
@@ -173,6 +191,7 @@ const AddTeacherPage = () => {
             && teacherState?.email?.length === 0
             && teacherState?.username?.length === 0
             && teacherState?.password?.length === 0
+            && teacherState?.role?.length === 0
         ) {
             setTeacherButtonState('create');
         }
@@ -186,8 +205,10 @@ const AddTeacherPage = () => {
             phone: '',
             address: '',
             email: '',
+            gender: 'male',
             username: '',
             password: '',
+            role: '',
         });
         setErrorMessage('');
     }
@@ -285,7 +306,7 @@ const AddTeacherPage = () => {
                             label=""
                             validateStatus={"validating"}
                             help=""
-                            style={{ marginBottom: '0px' }}
+                            style={{ marginBottom: '20px' }}
                             className='auth-form-item-add-new'
                         >
                             <FloatingLabelComponent
@@ -304,6 +325,26 @@ const AddTeacherPage = () => {
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
+
+                        {/* <Form.Item> */}
+                        <Row justify="start">
+                            <Col>
+                                &emsp; <span style={{ fontWeight: '600' }}>Gender:</span> &ensp;
+                                <CustomRadio
+                                    onChange={handleOnChangeTeacherState}
+                                    value={teacherState?.gender}
+                                    name="gender"
+                                >
+                                    <Button style={{ borderRadius: '25px', marginRight: '20px' }}>
+                                        <Radio value="male">Male</Radio>
+                                    </Button>
+                                    <Button style={{ borderRadius: '25px' }}>
+                                        <Radio value="female">Female</Radio>
+                                    </Button>
+                                </CustomRadio>
+                            </Col>
+                        </Row>
+                        {/* </Form.Item> */}
                     </Col>
                     <Col span={10} offset={2}>
                         <Form.Item
@@ -473,6 +514,8 @@ const AddTeacherPage = () => {
                                         address: record?.address,
                                         email: record?.email,
                                         username: record?.username,
+                                        gender: record?.gender,
+                                        role: record?.rolename,
                                     });
                                     // // change button 'create' teacher to button 'update'
                                     setTeacherButtonState('update');
@@ -531,4 +574,10 @@ const ErrorMessage = styled.div`
     text-align: start;
     margin: 15px 0px 0px 20px;
     color: #ff000d;
+`
+
+const CustomRadio = styled(Radio.Group)`
+    .ant-radio-wrapper-checked {
+        color: #1677c3;
+    }
 `

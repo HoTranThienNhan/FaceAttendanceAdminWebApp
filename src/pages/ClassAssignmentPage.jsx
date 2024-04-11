@@ -710,6 +710,14 @@ const ClassAssignmentPage = () => {
                                 className='unselected-day-button'
                                 type='default'
                                 onClick={(e) => handleCheckDay(e, 'Monday')}
+                                disabled={
+                                    classState?.id?.length === 0
+                                    || classState?.course?.length === 0
+                                    || classState?.year?.length === 0
+                                    || classState?.semester?.length === 0
+                                    || classState?.teacher?.length === 0
+                                    || classState?.students?.length === 0
+                                }
                             >
                                 Monday
                             </DaySelectionButton>
@@ -717,6 +725,14 @@ const ClassAssignmentPage = () => {
                                 className='unselected-day-button'
                                 type='default'
                                 onClick={(e) => handleCheckDay(e, 'Tuesday')}
+                                disabled={
+                                    classState?.id?.length === 0
+                                    || classState?.course?.length === 0
+                                    || classState?.year?.length === 0
+                                    || classState?.semester?.length === 0
+                                    || classState?.teacher?.length === 0
+                                    || classState?.students?.length === 0
+                                }
                             >
                                 Tuesday
                             </DaySelectionButton>
@@ -724,6 +740,14 @@ const ClassAssignmentPage = () => {
                                 className='unselected-day-button'
                                 type='default'
                                 onClick={(e) => handleCheckDay(e, 'Wednesday')}
+                                disabled={
+                                    classState?.id?.length === 0
+                                    || classState?.course?.length === 0
+                                    || classState?.year?.length === 0
+                                    || classState?.semester?.length === 0
+                                    || classState?.teacher?.length === 0
+                                    || classState?.students?.length === 0
+                                }
                             >
                                 Wednesday
                             </DaySelectionButton>
@@ -733,6 +757,14 @@ const ClassAssignmentPage = () => {
                                 className='unselected-day-button'
                                 type='default'
                                 onClick={(e) => handleCheckDay(e, 'Thursday')}
+                                disabled={
+                                    classState?.id?.length === 0
+                                    || classState?.course?.length === 0
+                                    || classState?.year?.length === 0
+                                    || classState?.semester?.length === 0
+                                    || classState?.teacher?.length === 0
+                                    || classState?.students?.length === 0
+                                }
                             >
                                 Thursday
                             </DaySelectionButton>
@@ -740,6 +772,14 @@ const ClassAssignmentPage = () => {
                                 className='unselected-day-button'
                                 type='default'
                                 onClick={(e) => handleCheckDay(e, 'Friday')}
+                                disabled={
+                                    classState?.id?.length === 0
+                                    || classState?.course?.length === 0
+                                    || classState?.year?.length === 0
+                                    || classState?.semester?.length === 0
+                                    || classState?.teacher?.length === 0
+                                    || classState?.students?.length === 0
+                                }
                             >
                                 Friday
                             </DaySelectionButton>
@@ -747,6 +787,14 @@ const ClassAssignmentPage = () => {
                                 className='unselected-day-button'
                                 type='default'
                                 onClick={(e) => handleCheckDay(e, 'Saturday')}
+                                disabled={
+                                    classState?.id?.length === 0
+                                    || classState?.course?.length === 0
+                                    || classState?.year?.length === 0
+                                    || classState?.semester?.length === 0
+                                    || classState?.teacher?.length === 0
+                                    || classState?.students?.length === 0
+                                }
                             >
                                 Saturday
                             </DaySelectionButton>
