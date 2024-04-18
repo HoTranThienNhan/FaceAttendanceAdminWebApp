@@ -1,4 +1,4 @@
-import { Button, Card, Col, Drawer, Form, Image, Input, Popconfirm, Radio, Row, Space } from 'antd';
+import { Breadcrumb, Button, Card, Col, Drawer, Form, Image, Input, Popconfirm, Radio, Row, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import TableComponent from '../components/TableComponent';
 import * as ServerService from '../services/ServerService';
@@ -12,6 +12,7 @@ import * as MessagePopup from '../components/MessagePopupComponent';
 import LoadingComponent from '../components/LoadingComponent';
 import ImageNotFound from '../assets/images/404-image-not-found.png';
 import Highlighter from 'react-highlight-words';
+import { useNavigate } from 'react-router-dom';
 
 const StudentManagementPage = () => {
 
@@ -254,8 +255,25 @@ const StudentManagementPage = () => {
         }
     }, [isSuccessReadd, isErrorReadd])
 
+    // navigate
+    const navigate = useNavigate();
+    const handleNavigateHomePage = () => {
+        navigate('/');
+    }
+
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 20px' }}>
+            <Breadcrumb
+                items={[
+                    {
+
+                        title: <span style={{ cursor: 'pointer' }} onClick={handleNavigateHomePage}>Home</span>,
+                    },
+                    {
+                        title: 'Student Management',
+                    },
+                ]}
+            />
             <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>STUDENTS MANAGEMENT</div>
             <Row style={{ border: '2px solid #cebdf561' }}>
                 <WrapperStudentManagement span={24}>

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Popconfirm, Row, Space, Switch } from 'antd';
+import { Breadcrumb, Button, Card, Col, Form, Input, Popconfirm, Row, Space, Switch } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import InputFormComponent from '../components/InputFormComponent';
 import { FieldNumberOutlined, ReadOutlined, SearchOutlined, SnippetsOutlined } from '@ant-design/icons';
@@ -9,6 +9,7 @@ import * as MessagePopup from '../components/MessagePopupComponent';
 import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
 import Highlighter from 'react-highlight-words';
+import { useNavigate } from 'react-router-dom';
 
 const CreateCoursePage = () => {
 
@@ -247,12 +248,27 @@ const CreateCoursePage = () => {
         }
 
     }
-    const handleActiveCourseCancel = () => {
+    const handleActiveCourseCancel = () => {}
 
+    // navigate
+    const navigate = useNavigate();
+    const handleNavigateHomePage = () => {
+        navigate('/');
     }
 
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
+            <Breadcrumb
+                items={[
+                    {
+
+                        title: <span style={{ cursor: 'pointer' }} onClick={handleNavigateHomePage}>Home</span>,
+                    },
+                    {
+                        title: 'Course Management',
+                    },
+                ]}
+            />
             <Row justify="space-between">
                 <Col span={6} style={{ marginTop: '20px' }}>
                     <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>COURSE INFORMATION</div>

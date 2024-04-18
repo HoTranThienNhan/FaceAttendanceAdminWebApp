@@ -1,7 +1,7 @@
 import { ClearOutlined, HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, QuestionCircleOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Form, Image, Popconfirm, Radio, Row, Tour } from 'antd';
+import { Breadcrumb, Button, Card, Col, Form, Image, Popconfirm, Radio, Row, Tour } from 'antd';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import InputFormComponent from '../components/InputFormComponent';
@@ -185,6 +185,17 @@ const AddStudentPage = () => {
 
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
+            <Breadcrumb
+                items={[
+                    {
+
+                        title: <span style={{ cursor: 'pointer' }} onClick={handleNavigateHomePage}>Home</span>,
+                    },
+                    {
+                        title: 'Add Student',
+                    },
+                ]}
+            />
             <Row>
                 <Col span={6} style={{ marginTop: '40px' }} ref={ref1}>
                     <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>STUDENT INFORMATION</div>

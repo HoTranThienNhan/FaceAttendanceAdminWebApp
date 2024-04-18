@@ -46,7 +46,7 @@ const HeaderComponent = () => {
       {
          key: '1',
          label: (
-            <a target="_blank" rel="noopener noreferrer" onClick={() => navigateCreateCoursePage()}>
+            <a target="_blank" rel="noopener noreferrer" onClick={() => navigateCourseManagementPage()}>
                Course Management
             </a>
          ),
@@ -74,7 +74,7 @@ const HeaderComponent = () => {
       {
          key: '1',
          label: (
-            <a target="_blank" rel="noopener noreferrer" onClick={() => navigateAddTeacherPage()}>
+            <a target="_blank" rel="noopener noreferrer" onClick={() => navigateTeacherManagementPage()}>
                Teacher Management
             </a>
          ),
@@ -101,14 +101,14 @@ const HeaderComponent = () => {
    const navigateAddStudentPage = () => {
       navigate('/add-student');
    }
-   const navigateCreateCoursePage = () => {
-      navigate('/create-course');
+   const navigateCourseManagementPage = () => {
+      navigate('/course-management');
    }
    const navigateStudentManagementPage = () => {
       navigate('/student-management');
    }
-   const navigateAddTeacherPage = () => {
-      navigate('/add-teacher');
+   const navigateTeacherManagementPage = () => {
+      navigate('/teacher-management');
    }
    const navigateClassAssignmentPage = () => {
       navigate('/class-assignment');
@@ -166,7 +166,7 @@ const HeaderComponent = () => {
                            <span
                               style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
                               className={'header-enable-hover'
-                                 + `${(location.pathname === '/create-course') ? ' checked' : ''}`}
+                                 + `${(location.pathname === '/course-management') ? ' checked' : ''}`}
                            >
                               Courses
                            </span>
@@ -184,7 +184,7 @@ const HeaderComponent = () => {
                            <span
                               style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
                               className={'header-enable-hover'
-                                 + `${(location.pathname === '/add-teacher') ? ' checked' : ''}`}
+                                 + `${(location.pathname === '/teacher-management') ? ' checked' : ''}`}
                            >
                               Teachers
                            </span>

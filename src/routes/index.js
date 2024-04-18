@@ -1,25 +1,16 @@
 import HomePage from "../pages/HomePage";
-import ScannerPage from "../pages/ScannerPage";
 import SignInPage from "../pages/SignInPage";
 import AddStudentPage from "../pages/AddStudentPage";
-import CreateCoursePage from "../pages/CreateCoursePage";
+import CourseManagementPage from "../pages/CourseManagementPage";
 import StudentManagementPage from "../pages/StudentManagementPage";
 import ClassAssignmentPage from "../pages/ClassAssignmentPage";
 import ClassManagementPage from "../pages/ClassManagementPage";
-import AddTeacherPage from "../pages/AddTeacherPage";
+import TeacherManagementPage from "../pages/TeacherManagementPage";
 
 export const routes = [
     {
         path: '/',
         page: HomePage,
-        isShowHeader: true,
-        isShowFooter: true,
-        isPrivate: false,
-        exact: false,
-    },
-    {
-        path: '/scanner',
-        page: ScannerPage,
         isShowHeader: true,
         isShowFooter: true,
         isPrivate: false,
@@ -50,8 +41,8 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/create-course',
-        page: CreateCoursePage,
+        path: '/course-management',
+        page: CourseManagementPage,
         isShowHeader: true,
         isShowFooter: true,
         isPrivate: false,
@@ -74,8 +65,8 @@ export const routes = [
         exact: false,
     },
     {
-        path: '/add-teacher',
-        page: AddTeacherPage,
+        path: '/teacher-management',
+        page: TeacherManagementPage,
         isShowHeader: true,
         isShowFooter: true,
         isPrivate: false,

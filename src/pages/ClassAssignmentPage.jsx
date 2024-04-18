@@ -1,5 +1,5 @@
 import { DownOutlined, FieldNumberOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Card, Col, DatePicker, Empty, Form, InputNumber, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
+import { Breadcrumb, Button, Card, Col, DatePicker, Empty, Form, InputNumber, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import TableComponent from '../components/TableComponent';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import { calculateValidTimeOut, getSeperateTimeFromMinutesAgo, getSeperateTimeFromMinutesLater } from '../utils';
+import { useNavigate } from 'react-router-dom';
 
 const ClassAssignmentPage = () => {
 
@@ -725,8 +726,25 @@ const ClassAssignmentPage = () => {
             });
     }
 
+    // navigate
+    const navigate = useNavigate();
+    const handleNavigateHomePage = () => {
+        navigate('/');
+    }
+
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
+            <Breadcrumb
+                items={[
+                    {
+
+                        title: <span style={{ cursor: 'pointer' }} onClick={handleNavigateHomePage}>Home</span>,
+                    },
+                    {
+                        title: 'Class Assignment',
+                    },
+                ]}
+            />
             <Row justify="center">
                 <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '25px' }}>CLASS ASSIGNMENT</div>
             </Row>

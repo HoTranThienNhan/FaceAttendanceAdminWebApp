@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Popconfirm, Radio, Row, Space } from 'antd';
+import { Breadcrumb, Button, Card, Col, Form, Input, Popconfirm, Radio, Row, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
@@ -12,8 +12,9 @@ import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
 import { containsNumber, isValidEmail, isValidPhoneNumber } from '../utils';
 import Highlighter from 'react-highlight-words';
+import { useNavigate } from 'react-router-dom';
 
-const AddTeacherPage = () => {
+const TeacherManagementPage = () => {
     const [teacherState, setTeacherState] = useState({
         id: '',
         fullname: '',
@@ -321,8 +322,25 @@ const AddTeacherPage = () => {
         setErrorMessage('');
     }
 
+    // navigate
+    const navigate = useNavigate();
+    const handleNavigateHomePage = () => {
+        navigate('/');
+    }
+
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
+            <Breadcrumb
+                items={[
+                    {
+
+                        title: <span style={{ cursor: 'pointer' }} onClick={handleNavigateHomePage}>Home</span>,
+                    },
+                    {
+                        title: 'Teacher Management',
+                    },
+                ]}
+            />
             <Row justify="space-between">
                 <Col span={24}>
                     <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '15px' }}>TEACHER INFORMATION</div>
@@ -638,7 +656,7 @@ const AddTeacherPage = () => {
     )
 };
 
-export default AddTeacherPage;
+export default TeacherManagementPage;
 
 const AddNewForm = styled(Form)`
     .ant-card-body {

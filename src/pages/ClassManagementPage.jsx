@@ -1,10 +1,11 @@
-import { Button, Card, Col, Divider, Input, Modal, Row, Space } from 'antd';
+import { Breadcrumb, Button, Card, Col, Divider, Input, Modal, Row, Space } from 'antd';
 import React, { useRef, useState } from 'react';
 import * as ServerService from '../services/ServerService';
 import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
 import { EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import { useNavigate } from 'react-router-dom';
 
 const ClassManagementPage = () => {
 
@@ -214,8 +215,25 @@ const ClassManagementPage = () => {
         setIsScheduleModalOpen(false);
     };
 
+    // navigate
+    const navigate = useNavigate();
+    const handleNavigateHomePage = () => {
+        navigate('/');
+    }
+
     return (
         <Card style={{ margin: '30px 100px', borderRadius: '15px', padding: '0px 30px' }}>
+            <Breadcrumb
+                items={[
+                    {
+
+                        title: <span style={{ cursor: 'pointer' }} onClick={handleNavigateHomePage}>Home</span>,
+                    },
+                    {
+                        title: 'Class Management',
+                    },
+                ]}
+            />
             <Row justify="center">
                 <div style={{ fontSize: '24px', fontWeight: '600', color: '#4d4d7f', marginBottom: '25px' }}>CLASS MANAGEMENT</div>
             </Row>
