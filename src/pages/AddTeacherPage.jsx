@@ -1,9 +1,9 @@
-import { Button, Card, Col, Form, Popconfirm, Radio, Row } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Form, Input, Popconfirm, Radio, Row, Space } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import InputFormComponent from '../components/InputFormComponent';
-import { ContactsOutlined, HomeOutlined, IdcardOutlined, LockOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
+import { ContactsOutlined, HomeOutlined, IdcardOutlined, LockOutlined, MailOutlined, PhoneOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import InputPasswordComponent from '../components/InputPasswordComponent';
 import * as ServerService from '../services/ServerService';
 import { useMutationHook } from '../hooks/useMutationHook';
@@ -11,6 +11,7 @@ import * as MessagePopup from '../components/MessagePopupComponent';
 import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
 import { containsNumber, isValidEmail, isValidPhoneNumber } from '../utils';
+import Highlighter from 'react-highlight-words';
 
 const AddTeacherPage = () => {
     const [teacherState, setTeacherState] = useState({
@@ -94,6 +95,80 @@ const AddTeacherPage = () => {
     );
     const { data, isLoading, isSuccess, isError } = mutation;
 
+    // search
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearchTable = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleResetSearch = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                    style={{ marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleResetSearch(clearFilters)}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => { close(); }}
+                    >
+                        close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
     // teachers table
     const teacherColumns = [
         {
@@ -101,12 +176,14 @@ const AddTeacherPage = () => {
             dataIndex: 'id',
             className: 'teacher-id',
             sorter: (a, b) => a.id.localeCompare(b.id),
+            ...getColumnSearchProps('id')
         },
         {
             title: 'Full Name',
             dataIndex: 'fullname',
             className: 'teacher-fullname',
             sorter: (a, b) => a.fullname.localeCompare(b.fullname),
+            ...getColumnSearchProps('fullname')
         },
         {
             title: 'Phone',
@@ -125,24 +202,55 @@ const AddTeacherPage = () => {
             dataIndex: 'email',
             className: 'teacher-email',
             sorter: (a, b) => a.email.localeCompare(b.email),
+            ...getColumnSearchProps('email')
         },
         {
             title: 'Gender',
             dataIndex: 'gender',
             className: 'teacher-gender',
-            sorter: (a, b) => a.gender.localeCompare(b.gender),
+            render: (text, record) => {
+                if (text === 'male') {
+                    return <span>Male</span>;
+                } else if (text === 'female') {
+                    return <span>Female</span>;
+                }
+            },
+            filters: [
+                {
+                    text: 'Male',
+                    value: 'male',
+                },
+                {
+                    text: 'Female',
+                    value: 'female',
+                },
+            ],
+            onFilter: (value, record) => record.gender === value,
+            filterMultiple: false
         },
         {
             title: 'Username',
             dataIndex: 'username',
             className: 'teacher-username',
             sorter: (a, b) => a.username.localeCompare(b.username),
+            ...getColumnSearchProps('username')
         },
         {
             title: 'Role',
             dataIndex: 'rolename',
             className: 'teacher-rolename',
-            sorter: (a, b) => a.rolename.localeCompare(b.rolename),
+            filters: [
+                {
+                    text: 'Teacher',
+                    value: 'Teacher',
+                },
+                {
+                    text: 'Admin',
+                    value: 'Admin',
+                },
+            ],
+            onFilter: (value, record) => record.rolename === value,
+            filterMultiple: false
         },
     ];
     const getAllTeachers = async () => {

@@ -53,8 +53,8 @@ export const getAvailableStudents = async (teacherid, courseid) => {
     return res.data;
 }
 
-export const updateStudent = async (id, fullname, phone, address, email) => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_student?id=${id}&fullname=${fullname}&phone=${phone}&address=${address}&email=${email}`);
+export const updateStudent = async (id, fullname, phone, address, email, gender) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/update_student?id=${id}&fullname=${fullname}&phone=${phone}&address=${address}&email=${email}&gender=${gender}`);
     return res.data;
 }
 

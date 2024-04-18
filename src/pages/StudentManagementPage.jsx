@@ -1,16 +1,17 @@
-import { Button, Card, Col, Drawer, Form, Image, Popconfirm, Row } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Drawer, Form, Image, Input, Popconfirm, Radio, Row, Space } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 import TableComponent from '../components/TableComponent';
 import * as ServerService from '../services/ServerService';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { FormOutlined, HomeOutlined, IdcardOutlined, LeftOutlined, MailOutlined, PhoneOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+import { FormOutlined, HomeOutlined, IdcardOutlined, LeftOutlined, MailOutlined, PhoneOutlined, ReloadOutlined, ScanOutlined, SearchOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import InputFormComponent from '../components/InputFormComponent';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import { useMutationHook } from '../hooks/useMutationHook';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import LoadingComponent from '../components/LoadingComponent';
 import ImageNotFound from '../assets/images/404-image-not-found.png';
+import Highlighter from 'react-highlight-words';
 
 const StudentManagementPage = () => {
 
@@ -25,6 +26,80 @@ const StudentManagementPage = () => {
     });
     const { isLoading: isLoadingAllStudents, data: allStudents } = queryAllStudents;
 
+    // search
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearchTable = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleResetSearch = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                    style={{ marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleResetSearch(clearFilters)}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => { close(); }}
+                    >
+                        close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
     // student table columns
     const studentColumns = [
         {
@@ -32,12 +107,14 @@ const StudentManagementPage = () => {
             dataIndex: 'id',
             className: 'student-id',
             sorter: (a, b) => a.id.localeCompare(b.id),
+            ...getColumnSearchProps('id')
         },
         {
             title: 'Full Name',
             dataIndex: 'fullname',
             className: 'student-full-name',
             sorter: (a, b) => a.fullname.localeCompare(b.fullname),
+            ...getColumnSearchProps('fullname')
         },
         {
             title: 'Phone',
@@ -55,6 +132,12 @@ const StudentManagementPage = () => {
             dataIndex: 'email',
             className: 'student-email',
             sorter: (a, b) => a.email.localeCompare(b.email),
+        },
+        {
+            title: 'Gender',
+            dataIndex: 'gender',
+            className: 'student-gender',
+            sorter: (a, b) => a.gender.localeCompare(b.gender),
         },
         {
             title: 'Update',
@@ -78,6 +161,7 @@ const StudentManagementPage = () => {
             phone: record?.phone,
             address: record?.address,
             email: record?.email,
+            gender: record?.gender
         });
     }
 
@@ -99,6 +183,7 @@ const StudentManagementPage = () => {
         phone: '',
         address: '',
         email: '',
+        gender: 'male'
     });
     // handle on change input
     const handleOnChangeStudentState = (e) => {
@@ -116,7 +201,8 @@ const StudentManagementPage = () => {
             const phone = studentState?.phone;
             const address = studentState?.address;
             const email = studentState?.email;
-            const res = ServerService.updateStudent(id, fullname, phone, address, email);
+            const gender = studentState?.gender;
+            const res = ServerService.updateStudent(id, fullname, phone, address, email, gender);
             return res;
         }
     );
@@ -329,6 +415,25 @@ const StudentManagementPage = () => {
                                             />
                                         </FloatingLabelComponent>
                                     </Form.Item>
+
+                                    <Row justify="start" style={{ marginTop: '20px' }}>
+                                        <Col>
+                                            <span style={{ fontWeight: '600' }}>Gender:</span> &ensp;
+                                            <CustomRadio
+                                                onChange={handleOnChangeStudentState}
+                                                value={studentState?.gender}
+                                                name="gender"
+                                            >
+                                                <Button style={{ borderRadius: '25px', marginRight: '10px' }}>
+                                                    <Radio value="male">Male</Radio>
+                                                </Button>
+                                                <Button style={{ borderRadius: '25px' }}>
+                                                    <Radio value="female">Female</Radio>
+                                                </Button>
+                                            </CustomRadio>
+                                        </Col>
+                                    </Row>
+
                                     <Popconfirm
                                         title="Update Student Information"
                                         description="Are you sure to update student information?"
@@ -455,5 +560,11 @@ const UpdateStudentForm = styled(Form)`
         border-radius: 25px; 
         margin-bottom: 20px; 
         margin-top: 20px;
+    }
+`
+
+const CustomRadio = styled(Radio.Group)`
+    .ant-radio-wrapper-checked {
+        color: #1677c3;
     }
 `

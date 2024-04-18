@@ -104,16 +104,16 @@ export const getSeperateTimeFromMinutesLater = (timeString, minutesLater) => {
 
 export const calculateValidTimeOut = (timeInInput, availableTimes) => {
     // 7-11 | 13-17 => valid: 00:00-06:59 | 11:01-12:59 | 17:01 - 11:59
-    const time = [
-        {
-            timein: '07:30:00',
-            timeout: '11:00:00'
-        },
-        {
-            timein: '13:00:00',
-            timeout: '17:00:00'
-        },
-    ];
+    // const time = [
+    //     {
+    //         timein: '07:30:00',
+    //         timeout: '11:00:00'
+    //     },
+    //     {
+    //         timein: '13:00:00',
+    //         timeout: '17:00:00'
+    //     },
+    // ];
 
     // in_input < 1st in => out_input < 1st in
     // in_input < next in => out_input < next in

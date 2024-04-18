@@ -1,11 +1,86 @@
-import { Button, Card, Col, Divider, Modal, Row } from 'antd';
-import React, { useState } from 'react';
+import { Button, Card, Col, Divider, Input, Modal, Row, Space } from 'antd';
+import React, { useRef, useState } from 'react';
 import * as ServerService from '../services/ServerService';
 import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
 
 const ClassManagementPage = () => {
+
+    // search
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearchTable = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleResetSearch = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                    style={{ marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleResetSearch(clearFilters)}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => { close(); }}
+                    >
+                        close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
 
     // class columns
     const classColumns = [
@@ -14,6 +89,7 @@ const ClassManagementPage = () => {
             dataIndex: 'id',
             className: 'class-id',
             sorter: (a, b) => a.id.localeCompare(b.id),
+            ...getColumnSearchProps('id')
         },
         {
             title: 'Year',
@@ -30,24 +106,28 @@ const ClassManagementPage = () => {
             dataIndex: 'teacherid',
             className: 'class-teacher-id',
             sorter: (a, b) => a.teacherid.localeCompare(b.teacherid),
+            ...getColumnSearchProps('teacherid')
         },
         {
             title: 'Teacher Name',
             dataIndex: 'teachername',
             className: 'class-teacher-name',
             sorter: (a, b) => a.teachername.localeCompare(b.teachername),
+            ...getColumnSearchProps('teachername')
         },
         {
             title: 'Course ID',
             dataIndex: 'courseid',
             className: 'class-course-id',
             sorter: (a, b) => a.courseid.localeCompare(b.courseid),
+            ...getColumnSearchProps('courseid')
         },
         {
             title: 'Course Name',
             dataIndex: 'coursename',
             className: 'class-course-name',
             sorter: (a, b) => a.coursename.localeCompare(b.coursename),
+            ...getColumnSearchProps('coursename')
         },
         {
             title: 'Students',
@@ -55,7 +135,7 @@ const ClassManagementPage = () => {
             className: 'class-students',
             render: (index, record) => {
                 return (
-                    <Button onClick={() => showStudentsModal(record?.id)}>
+                    <Button onClick={() => showStudentsModal(record?.id, record?.teacherid, record?.teachername, record?.courseid, record?.coursename)}>
                         <EllipsisOutlined style={{ fontSize: '22px' }} />
                     </Button>
                 );
@@ -89,10 +169,26 @@ const ClassManagementPage = () => {
     const [isStudentsModalOpen, setIsStudentsModalOpen] = useState(false);
     const [allStudentsByClass, setAllStudentsByClass] = useState([]);
     const [selectedClassId, setSelectedClassId] = useState('');
-    const showStudentsModal = async (classid) => {
+    const [selectedTeacher, setSelectedTeacher] = useState({
+        id: '',
+        name: ''
+    });
+    const [selectedCourse, setSelectedCourse] = useState({
+        id: '',
+        name: ''
+    });
+    const showStudentsModal = async (classid, teacherid, teachername, courseid, coursename) => {
         const res_all_students = await ServerService.getAllStudentsByClass(classid);
         setAllStudentsByClass(res_all_students);
         setSelectedClassId(classid);
+        setSelectedTeacher({
+            id: teacherid,
+            name: teachername
+        });
+        setSelectedCourse({
+            id: courseid,
+            name: coursename
+        });
         setIsStudentsModalOpen(true);
     };
     const handleStudentsModalOk = () => {
@@ -140,8 +236,14 @@ const ClassManagementPage = () => {
                 onCancel={handleStudentsModalCancel}
                 width={600}
             >
-                <div style={{ fontSize: '20px', marginBottom: '20px', fontWeight: '600' }}>
+                <div style={{ fontSize: '22px', marginBottom: '7px', fontWeight: '600' }}>
                     Class ID: {selectedClassId}
+                </div>
+                <div style={{ fontSize: '18px', marginBottom: '7px', fontWeight: '600' }}>
+                    Teacher: {selectedTeacher?.id} - {selectedTeacher?.name}
+                </div>
+                <div style={{ fontSize: '18px', marginBottom: '20px', fontWeight: '600' }}>
+                    Course: {selectedCourse?.id} - {selectedCourse?.name}
                 </div>
                 <Divider />
                 <div style={{ fontSize: '18px', marginBottom: '5px', fontWeight: '600' }}>
@@ -168,8 +270,14 @@ const ClassManagementPage = () => {
                 onCancel={handleScheduleModalCancel}
                 width={600}
             >
-                <div style={{ fontSize: '20px', marginBottom: '20px', fontWeight: '600' }}>
+                <div style={{ fontSize: '22px', marginBottom: '7px', fontWeight: '600' }}>
                     Class ID: {selectedClassId}
+                </div>
+                <div style={{ fontSize: '18px', marginBottom: '7px', fontWeight: '600' }}>
+                    Teacher: {selectedTeacher?.id} - {selectedTeacher?.name}
+                </div>
+                <div style={{ fontSize: '18px', marginBottom: '20px', fontWeight: '600' }}>
+                    Course: {selectedCourse?.id} - {selectedCourse?.name}
                 </div>
                 <Divider />
                 <div style={{ fontSize: '18px', marginBottom: '50px', padding: '0px 30px' }}>

@@ -1,5 +1,5 @@
 import { DownOutlined, FieldNumberOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Card, Col, DatePicker, Empty, Form, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
+import { Button, Card, Col, DatePicker, Empty, Form, InputNumber, Popconfirm, Row, Select, Table, TimePicker } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
@@ -65,6 +65,16 @@ const ClassAssignmentPage = () => {
         setErrorMessage('');
     }
 
+
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SEMESTER >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // handle on change class semester
+    const handleOnChangeClassSemester = (semester) => {
+        setClassState({
+            ...classState,
+            semester: semester
+        });
+    }
+
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TEACHERS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // get all teachers
     const getAllTeachers = async () => {
@@ -73,7 +83,8 @@ const ClassAssignmentPage = () => {
     }
     const queryAllTeachers = useQuery({
         queryKey: ['teachers'],
-        queryFn: getAllTeachers
+        queryFn: getAllTeachers,
+        enabled: classState?.teacher?.length === 0
     });
     const { isLoading: isLoadingAllTeachers, data: allTeachers } = queryAllTeachers;
 
@@ -83,21 +94,97 @@ const ClassAssignmentPage = () => {
             ...classState,
             teacher: teacher
         });
-
     }
+
+    useEffect(() => {
+        setSelectedStudentsItems([]);
+        setClassState({
+            ...classState,
+            course: '',
+            students: [],
+            time: [
+                {
+                    day: 'Monday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Tuesday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Wednesday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Thursday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Friday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Saturday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+            ],
+        });
+        setDayData([
+            {
+                key: '1',
+                day: 'Monday',
+                isActive: false
+            },
+            {
+                key: '2',
+                day: 'Tuesday',
+                isActive: false
+            },
+            {
+                key: '3',
+                day: 'Wednesday',
+                isActive: false
+            },
+            {
+                key: '4',
+                day: 'Thursday',
+                isActive: false
+            },
+            {
+                key: '5',
+                day: 'Friday',
+                isActive: false
+            },
+            {
+                key: '6',
+                day: 'Saturday',
+                isActive: false
+            },
+        ]);
+        [...document.getElementsByClassName('selected-day-button')].map((element) => {
+            console.log(element);
+            element.classList.remove('selected-day-button');
+            element.classList.add('unselected-day-button');
+        });
+        if (classState?.teacher?.length > 0) {
+            getAllActiveCourses();
+        }
+    }, [classState?.teacher]);
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< COURSES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // get all active courses
+    const [allActiveCourses, setAllActiveCourses] = useState([]);
     const getAllActiveCourses = async () => {
         const res = await ServerService.getAllActiveCourses();
+        setAllActiveCourses(res);
         return res;
     }
-    const queryAllActiveCourses = useQuery({
-        queryKey: ['active-courses'],
-        queryFn: getAllActiveCourses
-    });
-    const { isLoading: isLoadingAllActiveCourses, data: allActiveCourses } = queryAllActiveCourses;
-
     // handle on change course
     const handleOnChangeCourse = async (course) => {
         setClassState({
@@ -105,6 +192,199 @@ const ClassAssignmentPage = () => {
             course: course
         });
     }
+
+    useEffect(() => {
+        setSelectedStudentsItems([]);
+        setClassState({
+            ...classState,
+            students: [],
+            time: [
+                {
+                    day: 'Monday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Tuesday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Wednesday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Thursday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Friday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Saturday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+            ],
+        });
+        setDayData([
+            {
+                key: '1',
+                day: 'Monday',
+                isActive: false
+            },
+            {
+                key: '2',
+                day: 'Tuesday',
+                isActive: false
+            },
+            {
+                key: '3',
+                day: 'Wednesday',
+                isActive: false
+            },
+            {
+                key: '4',
+                day: 'Thursday',
+                isActive: false
+            },
+            {
+                key: '5',
+                day: 'Friday',
+                isActive: false
+            },
+            {
+                key: '6',
+                day: 'Saturday',
+                isActive: false
+            },
+        ]);
+        [...document.getElementsByClassName('selected-day-button')].map((element) => {
+            console.log(element);
+            element.classList.remove('selected-day-button');
+            element.classList.add('unselected-day-button');
+        });
+        if (classState?.course?.length > 0) {
+            getAvailableStudents();
+        }
+    }, [classState?.course]);
+
+
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< STUDENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // students quantity
+    const handleOnChangeStudentsQuantity = (value) => {
+        SET_MAX_STUDENTS_COUNT(value);
+        if (selectedStudentsItems.length > value) {
+            setSelectedStudentsItems([]);
+        }
+    }
+
+    // students selection
+    const [studentsOptions, setStudentsOptions] = useState([]);
+    const getAvailableStudents = async () => {
+        const res = await ServerService.getAvailableStudents(classState?.teacher, classState?.course);
+        let studentsOptionsArray = [];
+        res?.map((student, index) => {
+            studentsOptionsArray.push({
+                label: `${student?.id} - ${student?.fullname}`,
+                value: student?.id
+            });
+        });
+        setStudentsOptions(studentsOptionsArray);
+    }
+
+    const [selectedStudentsItems, setSelectedStudentsItems] = useState([]);
+    // const MAX_STUDENTS_COUNT = 20;
+    const [MAX_STUDENTS_COUNT, SET_MAX_STUDENTS_COUNT] = useState(20);
+    const suffixStudentsSelection = (
+        <>
+            <span>
+                {selectedStudentsItems.length} / {MAX_STUDENTS_COUNT}
+            </span>
+            <DownOutlined />
+        </>
+    );
+    useEffect(() => {
+        setClassState({
+            ...classState,
+            students: selectedStudentsItems,
+            time: [
+                {
+                    day: 'Monday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Tuesday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Wednesday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Thursday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Friday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+                {
+                    day: 'Saturday',
+                    timeIn: '',
+                    timeOut: '',
+                },
+            ],
+        });
+        [...document.getElementsByClassName('selected-day-button')].map((element) => {
+            element.classList.remove('selected-day-button');
+            element.classList.add('unselected-day-button');
+        });
+        setDayData([
+            {
+                key: '1',
+                day: 'Monday',
+                isActive: false
+            },
+            {
+                key: '2',
+                day: 'Tuesday',
+                isActive: false
+            },
+            {
+                key: '3',
+                day: 'Wednesday',
+                isActive: false
+            },
+            {
+                key: '4',
+                day: 'Thursday',
+                isActive: false
+            },
+            {
+                key: '5',
+                day: 'Friday',
+                isActive: false
+            },
+            {
+                key: '6',
+                day: 'Saturday',
+                isActive: false
+            },
+        ]);
+        if (selectedStudentsItems.length === 1) {
+            getTimeInAndOutByTeacherIdAndDay();
+        }
+    }, [selectedStudentsItems]);
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< YEAR >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // set up disable year
@@ -120,16 +400,15 @@ const ClassAssignmentPage = () => {
         });
     };
 
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SEMESTER >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // handle on change class semester
-    const handleOnChangeClassSemester = (semester) => {
-        setClassState({
-            ...classState,
-            semester: semester
-        });
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TIME IN - TIME OUT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // get time in and time out by teacher id and day
+    const [timeInAndOutByTeacherIdAndDay, setTimeInAndOutByTeacherIdAndDay] = useState('');
+    const getTimeInAndOutByTeacherIdAndDay = async () => {
+        const resTimeInAndOut = await ServerService.getTimeInAndOutByTeacherIdAndDay(classState?.teacher, day);
+        setTimeInAndOutByTeacherIdAndDay(resTimeInAndOut);
+        return resTimeInAndOut;
     }
 
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TIME IN - TIME OUT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // class schedule columns table
     const classColumns = [
         {
@@ -203,16 +482,14 @@ const ClassAssignmentPage = () => {
                 },
                 disabledSeconds: () => []
             }
-        } else if (type === 'end') { 
+        } else if (type === 'end') {
             const selectedHourIn = parseInt(selectedTimeIn.split(':')[0]);
             const selectedMinuteIn = parseInt(selectedTimeIn.split(':')[1]);
-            
+
             const standardValidTimeOut = calculateValidTimeOut(selectedTimeIn, resTimeInAndOut);
             const availableHourIn = parseInt(standardValidTimeOut.split(':')[0]);
             const availableMinuteIn = parseInt(standardValidTimeOut.split(':')[1]);
 
-            console.log(selectedHourIn, selectedMinuteIn);
-            console.log(availableHourIn, availableMinuteIn);
             return {
                 disabledHours: () => {
                     let disabledHoursArray = [];
@@ -239,19 +516,7 @@ const ClassAssignmentPage = () => {
             }
         }
     }
-    // get time in and time out by teacher id and day
-    const getTimeInAndOutByTeacherIdAndDay = async () => {
-        const resTimeInAndOut = await ServerService.getTimeInAndOutByTeacherIdAndDay(classState?.teacher, day);
-        return resTimeInAndOut;
-    }
-    const queryAllTimeInAndOutByTeacherIdAndDay = useQuery({
-        queryKey: ['time-in-and-out'],
-        queryFn: getTimeInAndOutByTeacherIdAndDay
-    });
-    const { isLoading: isLoadingTimeInAndOutByTeacherIdAndDay, data: timeInAndOutByTeacherIdAndDay } = queryAllTimeInAndOutByTeacherIdAndDay;
-    useEffect(() => {
-        queryAllTimeInAndOutByTeacherIdAndDay.refetch();
-    }, [classState?.teacher, day]);
+
     // render time in and out range picker
     const timeInOutRangePicker = () => {
         return (
@@ -366,42 +631,6 @@ const ClassAssignmentPage = () => {
         }
     }
 
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< STUDENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    // students selection
-    const [studentsOptions, setStudentsOptions] = useState([]);
-    const getAvailableStudents = async () => {
-        const res = await ServerService.getAvailableStudents(classState?.teacher, classState?.course);
-        let studentsOptionsArray = [];
-        res?.map((student, index) => {
-            studentsOptionsArray.push({
-                label: `${student?.id} - ${student?.fullname}`,
-                value: student?.id
-            });
-        });
-        setStudentsOptions(studentsOptionsArray);
-    }
-    useEffect(() => {
-        if (classState?.teacher?.length > 0 && classState?.course?.length > 0) {
-            getAvailableStudents();
-        }
-    }, [classState?.teacher, classState?.course]);
-
-    const [selectedStudentsItems, setSelectedStudentsItems] = useState([]);
-    const MAX_STUDENTS_COUNT = 20;
-    const suffixStudentsSelection = (
-        <>
-            <span>
-                {selectedStudentsItems.length} / {MAX_STUDENTS_COUNT}
-            </span>
-            <DownOutlined />
-        </>
-    );
-    useEffect(() => {
-        setClassState({
-            ...classState,
-            students: selectedStudentsItems
-        });
-    }, [selectedStudentsItems]);
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ADD CLASS BUTTON >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // handle add class
@@ -614,8 +843,8 @@ const ClassAssignmentPage = () => {
                             label=""
                             validateStatus={"validating"}
                             help=""
-                            style={{ marginBottom: '0px' }}
                             className='form-item-input'
+                            style={{ marginBottom: '0px' }}
                         >
                             <FloatingLabelComponent
                                 label="Course"
@@ -635,6 +864,36 @@ const ClassAssignmentPage = () => {
                                         );
                                     })}
                                 </Select>
+                            </FloatingLabelComponent>
+                        </Form.Item>
+
+                        <Form.Item
+                            label=""
+                            validateStatus={"validating"}
+                            help=""
+                            style={{ marginBottom: '0px', padding: '0px 20px' }}
+                            className='form-item-input'
+                        >
+                            <FloatingLabelComponent
+                                label="Student Quantity"
+                                value="student quantity"
+                                styleBefore={{ left: '22px', top: '31px' }}
+                                styleAfter={{ left: '22px', top: '23px' }}
+                            >
+                                <InputNumber
+                                    className='input-student-quantity'
+                                    min={1}
+                                    max={100}
+                                    defaultValue={MAX_STUDENTS_COUNT}
+                                    onChange={handleOnChangeStudentsQuantity}
+                                    value={MAX_STUDENTS_COUNT}
+                                    style={{
+                                        width: '100%',
+                                        height: '45px',
+                                        borderRadius: '25px',
+                                        padding: '10px 20px 0px 10px'
+                                    }}
+                                />
                             </FloatingLabelComponent>
                         </Form.Item>
 
@@ -832,7 +1091,7 @@ const AddNewForm = styled(Form)`
         border-radius: 0 0 8px 8px;
     }
 
-    .input-class-id, .input-add-new, .input-select-semester, .input-select-teacher, .input-year-picker, .input-select-students {
+    .input-class-id, .input-add-new, .input-select-semester, .input-select-teacher, .input-year-picker, .input-select-students, .input-student-quantity {
         height: 45px;
         border-radius: 25px;
         padding: 0px 18px;

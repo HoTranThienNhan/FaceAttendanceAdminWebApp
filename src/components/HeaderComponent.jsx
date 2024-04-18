@@ -1,10 +1,11 @@
 import { DownOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { resetUser } from '../redux/slices/userSlice';
 import { Col, Dropdown, Row, Space } from 'antd';
 import * as MessagePopup from '../components/MessagePopupComponent';
+import styled from 'styled-components';
 
 
 const HeaderComponent = () => {
@@ -12,6 +13,7 @@ const HeaderComponent = () => {
 
    const navigate = useNavigate();
    const dispatch = useDispatch();
+   const location = useLocation();
 
    const handleSignOut = () => {
       dispatch(resetUser());
@@ -24,7 +26,9 @@ const HeaderComponent = () => {
       {
          key: '1',
          label: (
-            <a target="_blank" rel="noopener noreferrer" onClick={() => navigateAddStudentPage()}>
+            <a target="_blank" rel="noopener noreferrer" onClick={() => {
+               navigateAddStudentPage();
+            }}>
                Add Student
             </a>
          ),
@@ -121,9 +125,18 @@ const HeaderComponent = () => {
             </Col>
             {user?.fullname
                ?
-               <Col span={18} style={{ color: '#fff', fontWeight: '700', width: '600px' }}>
+               <CustomHeaderCol span={18} style={{ color: '#fff', fontWeight: '700', width: '600px' }}>
                   <Row justify='end'>
-                     <Col span={4}>
+                     <Col span={3}>
+                        <span
+                           style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
+                           className={'home-page-header header-enable-hover' + `${(location.pathname === '/') ? ' checked' : ''}`}
+                           onClick={() => navigateHomePage()}
+                        >
+                           Home Page
+                        </span>
+                     </Col>
+                     <Col span={3}>
                         <Dropdown
                            menu={{
                               items: navStudentItems,
@@ -132,12 +145,16 @@ const HeaderComponent = () => {
                               pointAtCenter: true,
                            }}
                         >
-                           <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
+                           <span
+                              style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
+                              className={'students-page-header header-enable-hover'
+                                 + `${(location.pathname === '/add-student' || location.pathname === '/student-management') ? ' checked' : ''}`}
+                           >
                               Students
                            </span>
                         </Dropdown>
                      </Col>
-                     <Col span={4}>
+                     <Col span={3}>
                         <Dropdown
                            menu={{
                               items: navCourseItems,
@@ -146,12 +163,16 @@ const HeaderComponent = () => {
                               pointAtCenter: true,
                            }}
                         >
-                           <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
+                           <span
+                              style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
+                              className={'header-enable-hover'
+                                 + `${(location.pathname === '/create-course') ? ' checked' : ''}`}
+                           >
                               Courses
                            </span>
                         </Dropdown>
                      </Col>
-                     <Col span={4}>
+                     <Col span={3}>
                         <Dropdown
                            menu={{
                               items: navTeacherItems,
@@ -160,12 +181,16 @@ const HeaderComponent = () => {
                               pointAtCenter: true,
                            }}
                         >
-                           <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
+                           <span
+                              style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
+                              className={'header-enable-hover'
+                                 + `${(location.pathname === '/add-teacher') ? ' checked' : ''}`}
+                           >
                               Teachers
                            </span>
                         </Dropdown>
                      </Col>
-                     <Col span={4}>
+                     <Col span={3}>
                         <Dropdown
                            menu={{
                               items: navClassItems,
@@ -174,7 +199,11 @@ const HeaderComponent = () => {
                               pointAtCenter: true,
                            }}
                         >
-                           <span style={{ fontSize: '16px', cursor: 'pointer', color: '#fff', fontWeight: '700' }}>
+                           <span
+                              style={{ fontSize: '16px', cursor: 'pointer', fontWeight: '700' }}
+                              className={'header-enable-hover'
+                                 + `${(location.pathname === '/class-assignment' || location.pathname === '/class-management') ? ' checked' : ''}`}
+                           >
                               Classes
                            </span>
                         </Dropdown>
@@ -192,7 +221,7 @@ const HeaderComponent = () => {
                         </Dropdown>
                      </Col>
                   </Row>
-               </Col>
+               </CustomHeaderCol>
                :
                <Col style={{ color: '#fff', fontWeight: '700' }}>
                   <div style={{ cursor: 'pointer' }} onClick={() => navigateSignInPage()}>Sign In</div>
@@ -204,3 +233,15 @@ const HeaderComponent = () => {
 };
 
 export default HeaderComponent;
+
+const CustomHeaderCol = styled(Col)`
+   .checked {
+      color: #5c32cb;
+      border-bottom: 2px solid;
+   }
+
+   .header-enable-hover:hover {
+      color: #5c32cb !important;
+      border-bottom: 2px solid;
+   }
+`

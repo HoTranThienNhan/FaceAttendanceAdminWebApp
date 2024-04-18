@@ -1,7 +1,7 @@
-import { HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, QuestionCircleOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+import { ClearOutlined, HomeOutlined, IdcardOutlined, MailOutlined, PhoneOutlined, QuestionCircleOutlined, ReloadOutlined, ScanOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Form, Image, Popconfirm, Row, Tour } from 'antd';
+import { Button, Card, Col, Form, Image, Popconfirm, Radio, Row, Tour } from 'antd';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import InputFormComponent from '../components/InputFormComponent';
@@ -23,6 +23,7 @@ const AddStudentPage = () => {
         phone: '',
         address: '',
         email: '',
+        gender: 'male',
     });
 
     const [studentStateError, setStudentStateError] = useState({
@@ -31,11 +32,14 @@ const AddStudentPage = () => {
         phone: '',
         address: '',
         email: '',
+        gender: 'male',
     });
 
     // scan
     const [scanURL, setScanURL] = useState(ImageNotFound);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isScanned, setIsScanned] = useState(false);
+    const [isAdded, setIsAdded] = useState(false);
     const scan = async (newuser) => {
         if (containsNumber(studentState?.fullname) === true) {
             MessagePopup.error('Invalid student full name');
@@ -50,11 +54,12 @@ const AddStudentPage = () => {
             // create user folder in server
             await ServerService.createScan(newuser)
                 .then(res => {
-                    MessagePopup.success('Scan new student successfully');
+                    MessagePopup.warning('Please wait a few seconds for preparing camera');
                     // parse student state object to query string
                     const queryString = new URLSearchParams(studentState).toString();
                     // streaming 
                     setScanURL(`${process.env.REACT_APP_API_URL}/video_feed?${queryString}`);
+                    setIsScanned(true);
                 })
                 .catch(err => {
                     setErrorMessage(err.message);
@@ -67,6 +72,7 @@ const AddStudentPage = () => {
     // add
     const mutation = useMutationHook(
         (studentId) => {
+            setIsAdded(true);
             const res = ServerService.addNew(studentId);
             return res;
         }
@@ -100,6 +106,22 @@ const AddStudentPage = () => {
         setReloadImage(Math.random());
     }
 
+    // clear
+    const clear = () => {
+        setStudentState({
+            id: '',
+            fullname: '',
+            phone: '',
+            address: '',
+            email: '',
+            gender: 'male',
+        });
+        setScanURL(ImageNotFound);
+        resetImage();
+        setIsScanned(false);
+        setIsAdded(false);
+    }
+
     // handle on change input
     const handleOnChangeStudentState = (e) => {
         setStudentState({
@@ -122,6 +144,7 @@ const AddStudentPage = () => {
     const ref2 = useRef(null);
     const ref3 = useRef(null);
     const ref4 = useRef(null);
+    const ref5 = useRef(null);
     const [openHelpTour, setOpenHelpTour] = useState(false);
     const helpTourSteps = [
         {
@@ -143,6 +166,11 @@ const AddStudentPage = () => {
             title: 'REFRESH SCAN',
             description: 'If there are any problems while scanning face, this helps you to re-scan face.',
             target: () => ref4.current,
+        },
+        {
+            title: 'CLEAR',
+            description: 'This button is to help you clear student form in order to add another student',
+            target: () => ref5.current,
             nextButtonProps: {
                 children: "Got it"
             }
@@ -286,6 +314,24 @@ const AddStudentPage = () => {
                                 />
                             </FloatingLabelComponent>
                         </Form.Item>
+
+                        <Row justify="start" style={{ marginTop: '20px' }}>
+                            <Col>
+                                <span style={{ fontWeight: '600' }}>Gender:</span> &ensp;
+                                <CustomRadio
+                                    onChange={handleOnChangeStudentState}
+                                    value={studentState?.gender}
+                                    name="gender"
+                                >
+                                    <Button style={{ borderRadius: '25px', marginRight: '10px' }}>
+                                        <Radio value="male">Male</Radio>
+                                    </Button>
+                                    <Button style={{ borderRadius: '25px' }}>
+                                        <Radio value="female">Female</Radio>
+                                    </Button>
+                                </CustomRadio>
+                            </Col>
+                        </Row>
                     </AddNewForm>
 
                     {errorMessage?.length > 0 && <ErrorMessage>{errorMessage}</ErrorMessage>}
@@ -293,7 +339,7 @@ const AddStudentPage = () => {
 
                 <Col offset={1} span={17}>
                     <Row>
-                        <Col offset={7}>
+                        <Col offset={5}>
                             <Button
                                 style={{ borderRadius: '15px', backgroundColor: '#a0a0e1' }}
                                 type='primary'
@@ -306,6 +352,7 @@ const AddStudentPage = () => {
                                     || studentState?.phone?.length === 0
                                     || studentState?.address?.length === 0
                                     || studentState?.email?.length === 0
+                                    || isScanned === true
                                 }
                             >
                                 SCAN
@@ -322,6 +369,8 @@ const AddStudentPage = () => {
                                     || studentState?.phone?.length === 0
                                     || studentState?.address?.length === 0
                                     || studentState?.email?.length === 0
+                                    || isScanned === false
+                                    || isAdded === true
                                 }
                             >
                                 ADD
@@ -344,13 +393,31 @@ const AddStudentPage = () => {
                                         || studentState?.phone?.length === 0
                                         || studentState?.address?.length === 0
                                         || studentState?.email?.length === 0
+                                        || isScanned === false
                                     }
                                 >
                                     REFRESH SCAN
                                 </Button>
                             </Popconfirm>
+                            <Popconfirm
+                                title="Clear"
+                                description="Are you sure to clear this student information?"
+                                onConfirm={() => clear()}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button
+                                    style={{ borderRadius: '15px', backgroundColor: '#a0a0e1', marginLeft: '20px' }}
+                                    type='primary'
+                                    icon={<ClearOutlined />}
+                                    ref={ref5}
+                                    disabled={isAdded === false}
+                                >
+                                    CLEAR
+                                </Button>
+                            </Popconfirm>
                         </Col>
-                        <Col offset={4}>
+                        <Col offset={3}>
                             <Button
                                 style={{ borderRadius: '15px', color: '#4d4d7f', border: '1px solid #9c93ed' }}
                                 onClick={() => setOpenHelpTour(true)}
@@ -363,8 +430,6 @@ const AddStudentPage = () => {
                             />
                         </Col>
                     </Row>
-
-
 
                     <LoadingComponent isLoading={isLoading}>
                         <Image
@@ -417,4 +482,10 @@ const ErrorMessage = styled.div`
     text-align: start;
     margin: 15px 0px 0px 20px;
     color: #ff000d;
+`
+
+const CustomRadio = styled(Radio.Group)`
+    .ant-radio-wrapper-checked {
+        color: #1677c3;
+    }
 `

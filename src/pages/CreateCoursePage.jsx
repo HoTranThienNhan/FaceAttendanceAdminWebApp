@@ -1,13 +1,14 @@
-import { Button, Card, Col, Form, Popconfirm, Row, Switch } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Form, Input, Popconfirm, Row, Space, Switch } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 import InputFormComponent from '../components/InputFormComponent';
-import { FieldNumberOutlined, ReadOutlined, SnippetsOutlined } from '@ant-design/icons';
+import { FieldNumberOutlined, ReadOutlined, SearchOutlined, SnippetsOutlined } from '@ant-design/icons';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import styled from 'styled-components';
 import * as ServerService from '../services/ServerService';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import TableComponent from '../components/TableComponent';
 import { useQuery } from '@tanstack/react-query';
+import Highlighter from 'react-highlight-words';
 
 const CreateCoursePage = () => {
 
@@ -92,6 +93,80 @@ const CreateCoursePage = () => {
         setErrorMessage('');
     }
 
+    // search
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef(null);
+    const handleSearchTable = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleResetSearch = (clearFilters) => {
+        clearFilters();
+        setSearchText('');
+    };
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                    style={{ marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => handleSearchTable(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() => clearFilters && handleResetSearch(clearFilters)}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => { close(); }}
+                    >
+                        close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
     // courses table
     const courseColumns = [
         {
@@ -99,12 +174,14 @@ const CreateCoursePage = () => {
             dataIndex: 'id',
             className: 'course-id',
             sorter: (a, b) => a.id.localeCompare(b.id),
+            ...getColumnSearchProps('id')
         },
         {
             title: 'Course Name',
             dataIndex: 'name',
             className: 'course-name',
             sorter: (a, b) => a.name.localeCompare(b.name),
+            ...getColumnSearchProps('name')
         },
         {
             title: 'Course Description',
