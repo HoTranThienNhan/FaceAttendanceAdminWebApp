@@ -10,7 +10,7 @@ import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import { useMutationHook } from '../hooks/useMutationHook';
 import * as MessagePopup from '../components/MessagePopupComponent';
 import LoadingComponent from '../components/LoadingComponent';
-import ImageNotFound from '../assets/images/404-image-not-found.png';
+import FaceAttendanceCameraBackground from '../assets/images/face-attendance-camera-background.png';
 import Highlighter from 'react-highlight-words';
 import { useNavigate } from 'react-router-dom';
 
@@ -173,7 +173,7 @@ const StudentManagementPage = () => {
     };
     const onCloseDrawer = () => {
         setOpenDrawer(false);
-        setScanURL(ImageNotFound);
+        setScanURL(FaceAttendanceCameraBackground);
         setStudentImage('');
     };
 
@@ -221,7 +221,7 @@ const StudentManagementPage = () => {
     }, [isSuccess, isError])
 
     // update scanner
-    const [scanURL, setScanURL] = useState(ImageNotFound);
+    const [scanURL, setScanURL] = useState(FaceAttendanceCameraBackground);
     const rescan = async (studentId) => {
         try {
             await ServerService.rescan(studentId);

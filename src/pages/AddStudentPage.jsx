@@ -6,7 +6,7 @@ import * as MessagePopup from '../components/MessagePopupComponent';
 import FloatingLabelComponent from '../components/FloatingLabelComponent';
 import InputFormComponent from '../components/InputFormComponent';
 import { styled } from "styled-components";
-import ImageNotFound from '../assets/images/404-image-not-found.png';
+import FaceAttendanceCameraBackground from '../assets/images/face-attendance-camera-background.png';
 import * as ServerService from '../services/ServerService';
 import { useMutationHook } from '../hooks/useMutationHook';
 import { useSelector } from 'react-redux';
@@ -36,7 +36,7 @@ const AddStudentPage = () => {
     });
 
     // scan
-    const [scanURL, setScanURL] = useState(ImageNotFound);
+    const [scanURL, setScanURL] = useState(FaceAttendanceCameraBackground);
     const [errorMessage, setErrorMessage] = useState('');
     const [isScanned, setIsScanned] = useState(false);
     const [isAdded, setIsAdded] = useState(false);
@@ -91,7 +91,7 @@ const AddStudentPage = () => {
 
     // refresh
     const refreshScan = async (newuser) => {
-        setScanURL(ImageNotFound);
+        setScanURL(FaceAttendanceCameraBackground);
         try {
             await ServerService.refreshScan(newuser);
             MessagePopup.success('Refresh student successfully');
@@ -100,6 +100,8 @@ const AddStudentPage = () => {
             return;
         }
         resetImage();
+        setIsScanned(false);
+        setIsAdded(false);
     }
     const [reloadImage, setReloadImage] = useState(1);
     const resetImage = () => {
@@ -116,7 +118,7 @@ const AddStudentPage = () => {
             email: '',
             gender: 'male',
         });
-        setScanURL(ImageNotFound);
+        setScanURL(FaceAttendanceCameraBackground);
         resetImage();
         setIsScanned(false);
         setIsAdded(false);

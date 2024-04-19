@@ -266,27 +266,30 @@ const TeacherManagementPage = () => {
 
     // update teacher
     const handleUpdateTeacher = async (teacherState) => {
-        try {
-            await ServerService.updateTeacher(teacherState);
-            MessagePopup.success('Update teacher successfully');
-            // refetch teachers table
-            queryAllTeachers.refetch();
-            // refresh teacher information form
-            setTeacherState({
-                id: '',
-                fullname: '',
-                phone: '',
-                address: '',
-                email: '',
-                gender: 'male',
-                username: '',
-                password: '',
-                role: '',
+        await ServerService.updateTeacher(teacherState)
+            .then(res => {
+                MessagePopup.success('Update teacher successfully');
+                // refetch teachers table
+                queryAllTeachers.refetch();
+                // refresh teacher information form
+                setTeacherState({
+                    id: '',
+                    fullname: '',
+                    phone: '',
+                    address: '',
+                    email: '',
+                    gender: 'male',
+                    username: '',
+                    password: '',
+                    role: '',
+                });
+                setErrorMessage('');
+            })
+            .catch(err => {
+                setErrorMessage(err.message);
+                MessagePopup.error('Cannot update teacher');
+                return;
             });
-        } catch (e) {
-            MessagePopup.error('Cannot update teacher');
-            return;
-        }
     }
 
     // teacher button state
