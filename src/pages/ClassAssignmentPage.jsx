@@ -299,7 +299,7 @@ const ClassAssignmentPage = () => {
     }
 
     const [selectedStudentsItems, setSelectedStudentsItems] = useState([]);
-    // const MAX_STUDENTS_COUNT = 20;
+    const [day, setDay] = useState('Monday');
     const [MAX_STUDENTS_COUNT, SET_MAX_STUDENTS_COUNT] = useState(20);
     const suffixStudentsSelection = (
         <>
@@ -382,8 +382,9 @@ const ClassAssignmentPage = () => {
                 isActive: false
             },
         ]);
+        console.log(day);
         if (selectedStudentsItems.length === 1) {
-            getTimeInAndOutByTeacherIdAndDay();
+            getTimeInAndOutByTeacherIdAndDay(classState?.teacher, day);
         }
     }, [selectedStudentsItems]);
 
@@ -404,8 +405,8 @@ const ClassAssignmentPage = () => {
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TIME IN - TIME OUT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // get time in and time out by teacher id and day
     const [timeInAndOutByTeacherIdAndDay, setTimeInAndOutByTeacherIdAndDay] = useState('');
-    const getTimeInAndOutByTeacherIdAndDay = async () => {
-        const resTimeInAndOut = await ServerService.getTimeInAndOutByTeacherIdAndDay(classState?.teacher, day);
+    const getTimeInAndOutByTeacherIdAndDay = async (teacher, day) => {
+        const resTimeInAndOut = await ServerService.getTimeInAndOutByTeacherIdAndDay(teacher, day);
         setTimeInAndOutByTeacherIdAndDay(resTimeInAndOut);
         return resTimeInAndOut;
     }
@@ -426,7 +427,6 @@ const ClassAssignmentPage = () => {
             }
         },
     ];
-    const [day, setDay] = useState('Monday');
 
     // range time in/out picker 
     const { RangePicker } = TimePicker;
@@ -1085,7 +1085,8 @@ const ClassAssignmentPage = () => {
                         onRow={(record, rowIndex) => {
                             return {
                                 onClick: (event) => {
-                                    setDay(record?.day)
+                                    setDay(record?.day);
+                                    getTimeInAndOutByTeacherIdAndDay(classState?.teacher, record?.day);
                                 }
                             }
                         }}

@@ -121,7 +121,7 @@ const HeaderComponent = () => {
       <div style={{ margin: '30px 100px' }}>
          <Row justify="space-between" style={{ backgroundColor: '#a0a0e1', padding: '25px 80px', borderRadius: '15px', textAlign: 'center' }}>
             <Col span={6} style={{ color: '#fff', fontWeight: '700' }}>
-               <div style={{ cursor: 'pointer', fontSize: '16px' }} onClick={() => navigateHomePage()}>FACE ATTENDANCE SYSTEM</div>
+               <div style={{ cursor: 'pointer', fontSize: '16px' }} onClick={() => navigateHomePage()}>FACE ATTENDANCE SYSTEM (ADMIN)</div>
             </Col>
             {user?.fullname
                ?
