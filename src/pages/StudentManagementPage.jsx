@@ -225,7 +225,7 @@ const StudentManagementPage = () => {
     const rescan = async (studentId) => {
         try {
             await ServerService.rescan(studentId);
-            MessagePopup.success('Re-scan successfully');
+            // MessagePopup.success('Re-scan successfully');
         } catch (e) {
             MessagePopup.error('Student ID cannot be re-scanned');
             return;
